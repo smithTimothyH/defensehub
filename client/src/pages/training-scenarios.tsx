@@ -2,14 +2,22 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import { GraduationCap, BookOpen, Target, CheckCircle, Clock, AlertTriangle, Play, FileText, Users, Shield, Mail, Key, Download } from "lucide-react";
+import { GraduationCap, BookOpen, Target, CheckCircle, Clock, AlertTriangle, Play, FileText, Users, Shield, Mail, Key, Download, Award, Star, TrendingUp, ChevronRight, ChevronLeft, Brain, Trophy } from "lucide-react";
 
 export default function TrainingScenarios() {
   const [selectedScenario, setSelectedScenario] = useState<any>(null);
   const [showTrainingDialog, setShowTrainingDialog] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
+  const [showExerciseModal, setShowExerciseModal] = useState(false);
+  const [currentExercise, setCurrentExercise] = useState<any>(null);
+  const [exerciseStep, setExerciseStep] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState("");
+  const [exerciseScore, setExerciseScore] = useState(0);
+  const [showResults, setShowResults] = useState(false);
 
   const scenarios = [
     {
@@ -130,12 +138,66 @@ export default function TrainingScenarios() {
           {
             title: "Phone Call Simulation",
             description: "Role-play scenarios where attackers try to extract information over the phone",
-            timeEstimate: "8 minutes"
+            timeEstimate: "8 minutes",
+            type: "interactive",
+            questions: [
+              {
+                scenario: "You receive a call from someone claiming to be from IT support asking for your login credentials to 'fix a security issue'.",
+                question: "What is the FIRST thing you should do?",
+                options: [
+                  "Provide your username and password immediately",
+                  "Ask for their employee ID and callback number",
+                  "Hang up and contact IT through official channels",
+                  "Ask them to prove they work for IT"
+                ],
+                correct: 2,
+                explanation: "Always hang up and verify through official channels. Legitimate IT never asks for passwords over the phone."
+              },
+              {
+                scenario: "The caller becomes aggressive and says 'Your account will be suspended in 5 minutes if you don't verify your credentials now!'",
+                question: "This is an example of which social engineering tactic?",
+                options: [
+                  "Authority manipulation",
+                  "Urgency and pressure",
+                  "Trust exploitation",
+                  "Technical intimidation"
+                ],
+                correct: 1,
+                explanation: "Creating artificial urgency and time pressure is a classic social engineering tactic to bypass rational thinking."
+              }
+            ]
           },
           {
             title: "Pretext Recognition",
             description: "Identify social engineering attempts in realistic business scenarios",
-            timeEstimate: "7 minutes"
+            timeEstimate: "7 minutes",
+            type: "interactive",
+            questions: [
+              {
+                scenario: "You receive an email claiming to be from your CEO requesting urgent wire transfer information for a 'confidential acquisition'.",
+                question: "What makes this email suspicious?",
+                options: [
+                  "Only the financial request",
+                  "The confidentiality aspect",
+                  "Combination of authority, urgency, secrecy, and financial request",
+                  "Nothing - CEOs can request this information"
+                ],
+                correct: 2,
+                explanation: "This email combines multiple social engineering tactics: authority (CEO), urgency (urgent), secrecy (confidential), and financial pressure."
+              },
+              {
+                scenario: "The email has perfect grammar and comes from what appears to be the CEO's email address.",
+                question: "Should you proceed with the request?",
+                options: [
+                  "Yes, since it looks legitimate",
+                  "No, verify through a separate communication channel",
+                  "Only if the amount is small",
+                  "Yes, but ask for more details first"
+                ],
+                correct: 1,
+                explanation: "Email addresses can be spoofed. Always verify high-stakes requests through known contact methods like calling the person directly."
+              }
+            ]
           }
         ]
       }
@@ -339,13 +401,12 @@ export default function TrainingScenarios() {
             <Button 
               className="w-full bg-cyber-primary hover:bg-blue-700"
               onClick={() => {
-                if (exercise.title === "Phone Call Simulation") {
-                  alert("PHONE CALL SIMULATION EXERCISE\n\nSCENARIO:\nYou receive a call from someone claiming to be from IT support asking for your login credentials to fix a security issue.\n\nTASK:\nIdentify the red flags and determine the appropriate response.\n\nRED FLAGS:\n• Unsolicited call asking for credentials\n• Creating urgency (security issue)\n• Requesting sensitive information over phone\n\nCORRECT RESPONSE:\nHang up and verify through official IT channels.\n\nREMEMBER: Legitimate IT never asks for passwords over the phone!");
-                } else if (exercise.title === "Pretext Recognition") {
-                  alert("PRETEXT RECOGNITION EXERCISE\n\nSCENARIO:\nAn email claims to be from your CEO requesting urgent wire transfer information for a confidential acquisition.\n\nTASK:\nAnalyze the email for social engineering tactics.\n\nSOCIAL ENGINEERING TACTICS:\n• Authority (claiming to be CEO)\n• Urgency (urgent request)\n• Secrecy (confidential acquisition)\n• Financial request (wire transfer)\n\nCORRECT RESPONSE:\nVerify through separate communication channel before taking any action.\n\nREMEMBER: Always verify high-stakes requests through known contact methods!");
-                } else {
-                  alert(`TRAINING EXERCISE: ${exercise.title.toUpperCase()}\n\nThis interactive exercise will help you practice identifying and responding to social engineering attacks in a safe environment.\n\nClick OK to begin the exercise.`);
-                }
+                setCurrentExercise(exercise);
+                setExerciseStep(0);
+                setExerciseScore(0);
+                setSelectedAnswer("");
+                setShowResults(false);
+                setShowExerciseModal(true);
               }}
             >
               <Play className="h-4 w-4 mr-2" />
@@ -716,6 +777,183 @@ export default function TrainingScenarios() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Training Progress Modal */}
+      <Dialog open={showTrainingDialog} onOpenChange={setShowTrainingDialog}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{selectedScenario?.title}</DialogTitle>
+          </DialogHeader>
+          {selectedScenario && renderTrainingContent()}
+        </DialogContent>
+      </Dialog>
+
+      {/* Interactive Exercise Modal */}
+      <Dialog open={showExerciseModal} onOpenChange={setShowExerciseModal}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center space-x-2">
+              <Brain className="h-5 w-5 text-cyber-primary" />
+              <span>{currentExercise?.title}</span>
+            </DialogTitle>
+            <DialogDescription>
+              Interactive cybersecurity training exercise
+            </DialogDescription>
+          </DialogHeader>
+          
+          {currentExercise?.questions && !showResults && (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-500">
+                  Question {exerciseStep + 1} of {currentExercise.questions.length}
+                </span>
+                <Badge variant="outline">
+                  Score: {exerciseScore}/{currentExercise.questions.length}
+                </Badge>
+              </div>
+              
+              <Progress 
+                value={((exerciseStep) / currentExercise.questions.length) * 100} 
+                className="w-full" 
+              />
+              
+              {currentExercise.questions[exerciseStep] && (
+                <div className="space-y-4">
+                  <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                    <h4 className="font-medium text-blue-900 mb-2">Scenario:</h4>
+                    <p className="text-blue-800">{currentExercise.questions[exerciseStep].scenario}</p>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <h4 className="font-medium">{currentExercise.questions[exerciseStep].question}</h4>
+                    <RadioGroup value={selectedAnswer} onValueChange={setSelectedAnswer}>
+                      {currentExercise.questions[exerciseStep].options.map((option: string, index: number) => (
+                        <div key={index} className="flex items-center space-x-2">
+                          <RadioGroupItem value={index.toString()} id={`option-${index}`} />
+                          <Label htmlFor={`option-${index}`} className="flex-1 cursor-pointer">
+                            {option}
+                          </Label>
+                        </div>
+                      ))}
+                    </RadioGroup>
+                  </div>
+                  
+                  <div className="flex justify-between">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setExerciseStep(Math.max(0, exerciseStep - 1))}
+                      disabled={exerciseStep === 0}
+                    >
+                      <ChevronLeft className="h-4 w-4 mr-2" />
+                      Previous
+                    </Button>
+                    <Button 
+                      onClick={() => {
+                        const correct = parseInt(selectedAnswer) === currentExercise.questions[exerciseStep].correct;
+                        if (correct) {
+                          setExerciseScore(exerciseScore + 1);
+                        }
+                        
+                        if (exerciseStep < currentExercise.questions.length - 1) {
+                          setExerciseStep(exerciseStep + 1);
+                          setSelectedAnswer("");
+                        } else {
+                          setShowResults(true);
+                        }
+                      }}
+                      disabled={selectedAnswer === ""}
+                      className="bg-cyber-primary hover:bg-blue-700"
+                    >
+                      {exerciseStep === currentExercise.questions.length - 1 ? "Finish" : "Next"}
+                      <ChevronRight className="h-4 w-4 ml-2" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          
+          {showResults && currentExercise && (
+            <div className="space-y-6 text-center">
+              <div className="space-y-4">
+                {exerciseScore === currentExercise.questions.length ? (
+                  <Trophy className="h-16 w-16 text-yellow-500 mx-auto" />
+                ) : exerciseScore >= currentExercise.questions.length * 0.7 ? (
+                  <Award className="h-16 w-16 text-green-500 mx-auto" />
+                ) : (
+                  <Target className="h-16 w-16 text-blue-500 mx-auto" />
+                )}
+                
+                <div>
+                  <h3 className="text-2xl font-bold mb-2">Exercise Complete!</h3>
+                  <p className="text-lg mb-4">
+                    You scored {exerciseScore} out of {currentExercise.questions.length}
+                  </p>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div className="bg-green-50 p-3 rounded-lg">
+                      <div className="text-green-600 font-medium">Accuracy</div>
+                      <div className="text-2xl font-bold text-green-700">
+                        {Math.round((exerciseScore / currentExercise.questions.length) * 100)}%
+                      </div>
+                    </div>
+                    <div className="bg-blue-50 p-3 rounded-lg">
+                      <div className="text-blue-600 font-medium">Questions</div>
+                      <div className="text-2xl font-bold text-blue-700">
+                        {currentExercise.questions.length}
+                      </div>
+                    </div>
+                    <div className="bg-purple-50 p-3 rounded-lg">
+                      <div className="text-purple-600 font-medium">Time</div>
+                      <div className="text-2xl font-bold text-purple-700">
+                        {currentExercise.timeEstimate}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {exerciseScore === currentExercise.questions.length && (
+                  <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
+                    <h4 className="font-medium text-yellow-900 mb-2">🏆 Perfect Score!</h4>
+                    <p className="text-yellow-800">
+                      Excellent work! You've demonstrated strong cybersecurity awareness skills.
+                    </p>
+                  </div>
+                )}
+                
+                {exerciseScore < currentExercise.questions.length * 0.7 && (
+                  <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+                    <h4 className="font-medium text-blue-900 mb-2">📚 Keep Learning!</h4>
+                    <p className="text-blue-800">
+                      Review the training materials and try again to improve your score.
+                    </p>
+                  </div>
+                )}
+              </div>
+              
+              <div className="flex space-x-3 justify-center">
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setExerciseStep(0);
+                    setExerciseScore(0);
+                    setSelectedAnswer("");
+                    setShowResults(false);
+                  }}
+                >
+                  Try Again
+                </Button>
+                <Button 
+                  onClick={() => setShowExerciseModal(false)}
+                  className="bg-cyber-primary hover:bg-blue-700"
+                >
+                  Continue Training
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

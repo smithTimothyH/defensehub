@@ -1,9 +1,19 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { GraduationCap, BookOpen, Target, CheckCircle, Clock, AlertTriangle } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { GraduationCap, BookOpen, Target, CheckCircle, Clock, AlertTriangle, Play, FileText, Users, Shield, Mail, Key, Phone, ExternalLink, Download } from "lucide-react";
 
 export default function TrainingScenarios() {
+  const [selectedScenario, setSelectedScenario] = useState<any>(null);
+  const [showTrainingDialog, setShowTrainingDialog] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
+
   const scenarios = [
     {
       id: 1,
@@ -14,6 +24,67 @@ export default function TrainingScenarios() {
       completed: true,
       type: "interactive",
       topics: ["Phishing", "Email Verification", "Safe Practices"],
+      steps: 6,
+      content: {
+        overview: "Master the basics of email security with hands-on training in identifying phishing attempts, verifying sender authenticity, and implementing safe email practices.",
+        objectives: [
+          "Identify common phishing indicators and red flags",
+          "Verify email sender authenticity using multiple methods",
+          "Implement safe email handling procedures",
+          "Report suspicious emails using proper channels",
+          "Understand the psychology behind phishing attacks"
+        ],
+        modules: [
+          {
+            title: "Introduction to Email Threats",
+            content: "Email remains the primary attack vector for cybercriminals. In this module, you'll learn about the various types of email-based attacks and why they're so effective.",
+            keyPoints: [
+              "95% of successful cyber attacks start with a phishing email",
+              "Email attacks have increased 400% since remote work began",
+              "Social engineering exploits human psychology, not just technology"
+            ]
+          },
+          {
+            title: "Identifying Phishing Indicators",
+            content: "Learn to spot the telltale signs of phishing emails through practical examples and interactive exercises.",
+            keyPoints: [
+              "Suspicious sender addresses and domain spoofing",
+              "Urgent language and artificial time pressure",
+              "Unexpected attachments or links",
+              "Grammar and spelling inconsistencies",
+              "Requests for sensitive information"
+            ]
+          },
+          {
+            title: "Email Verification Techniques",
+            content: "Master multiple methods to verify the authenticity of suspicious emails before taking any action.",
+            keyPoints: [
+              "Check sender's email address carefully",
+              "Hover over links to preview destinations",
+              "Verify through alternate communication channels",
+              "Use corporate directory to confirm identities",
+              "When in doubt, contact IT security team"
+            ]
+          }
+        ],
+        practicalExercises: [
+          {
+            title: "Phishing Email Analysis",
+            description: "Analyze 10 real-world phishing examples and identify red flags",
+            timeEstimate: "5 minutes"
+          },
+          {
+            title: "Safe Link Verification",
+            description: "Practice safe methods to verify suspicious links without clicking them",
+            timeEstimate: "3 minutes"
+          },
+          {
+            title: "Reporting Simulation",
+            description: "Complete the email reporting process using your organization's procedures",
+            timeEstimate: "2 minutes"
+          }
+        ]
+      }
     },
     {
       id: 2,
@@ -24,6 +95,69 @@ export default function TrainingScenarios() {
       completed: false,
       type: "scenario",
       topics: ["Psychology", "Manipulation", "Verification"],
+      steps: 8,
+      content: {
+        overview: "Understand the psychological tactics used by attackers to manipulate human behavior and learn defensive strategies to protect yourself and your organization.",
+        objectives: [
+          "Recognize common social engineering tactics and techniques",
+          "Understand psychological principles exploited by attackers",
+          "Develop verification procedures for unusual requests",
+          "Build resistance to manipulation attempts",
+          "Create organizational awareness and defense strategies"
+        ],
+        modules: [
+          {
+            title: "Psychology of Social Engineering",
+            content: "Social engineering attacks exploit fundamental human tendencies like trust, authority, urgency, and helpfulness. Understanding these psychological principles is key to defense.",
+            keyPoints: [
+              "Authority: People tend to comply with perceived authority figures",
+              "Urgency: Time pressure reduces critical thinking",
+              "Trust: Attackers build rapport before making requests",
+              "Reciprocity: People feel obligated to return favors",
+              "Social proof: People follow others' actions in uncertain situations"
+            ]
+          },
+          {
+            title: "Common Attack Vectors",
+            content: "Learn about the various channels and methods social engineers use to target victims.",
+            keyPoints: [
+              "Phone calls (vishing) - impersonating IT, executives, or vendors",
+              "Email campaigns with personalized information",
+              "Physical infiltration and tailgating",
+              "Social media reconnaissance and pretexting",
+              "USB drops and baiting attacks"
+            ]
+          },
+          {
+            title: "Defense Strategies",
+            content: "Develop practical defense mechanisms and verification procedures to protect against social engineering.",
+            keyPoints: [
+              "Always verify identity through independent channels",
+              "Question unusual requests, especially for sensitive information",
+              "Be skeptical of unsolicited contact",
+              "Follow established procedures for information sharing",
+              "Report suspicious interactions to security team"
+            ]
+          }
+        ],
+        practicalExercises: [
+          {
+            title: "Phone Call Simulation",
+            description: "Role-play scenarios where attackers try to extract information over the phone",
+            timeEstimate: "8 minutes"
+          },
+          {
+            title: "Pretext Recognition",
+            description: "Identify social engineering attempts in realistic business scenarios",
+            timeEstimate: "7 minutes"
+          },
+          {
+            title: "Verification Protocol Practice",
+            description: "Practice proper verification procedures for suspicious requests",
+            timeEstimate: "5 minutes"
+          }
+        ]
+      }
     },
     {
       id: 3,
@@ -34,6 +168,73 @@ export default function TrainingScenarios() {
       completed: false,
       type: "simulation",
       topics: ["Incident Response", "Communication", "Documentation"],
+      steps: 10,
+      content: {
+        overview: "Master the critical skills needed to properly identify, respond to, and report security incidents. Learn the importance of quick, accurate response in minimizing damage and preserving evidence.",
+        objectives: [
+          "Identify different types of security incidents",
+          "Execute proper incident response procedures",
+          "Communicate effectively during security incidents",
+          "Document incidents thoroughly for investigation",
+          "Coordinate with relevant teams and stakeholders",
+          "Preserve digital evidence and maintain chain of custody"
+        ],
+        modules: [
+          {
+            title: "Incident Identification and Classification",
+            content: "Learn to recognize different types of security incidents and understand their potential impact on business operations.",
+            keyPoints: [
+              "Malware infections and system compromises",
+              "Data breaches and unauthorized access",
+              "Denial of service and system outages",
+              "Insider threats and data exfiltration",
+              "Physical security breaches",
+              "Severity classification: Critical, High, Medium, Low"
+            ]
+          },
+          {
+            title: "Immediate Response Actions",
+            content: "Master the critical first steps that must be taken immediately upon discovering a security incident.",
+            keyPoints: [
+              "DO NOT panic or act hastily",
+              "Isolate affected systems if safe to do so",
+              "Document the current state with screenshots",
+              "Notify the security team immediately",
+              "Preserve all evidence - don't delete anything",
+              "Begin maintaining an incident timeline"
+            ]
+          },
+          {
+            title: "Communication and Escalation",
+            content: "Understand proper communication channels and escalation procedures during security incidents.",
+            keyPoints: [
+              "Use secure communication channels only",
+              "Follow the incident response communication tree",
+              "Provide clear, factual information",
+              "Avoid speculation or assumptions",
+              "Regular status updates to stakeholders",
+              "External communication must be pre-approved"
+            ]
+          }
+        ],
+        practicalExercises: [
+          {
+            title: "Malware Incident Simulation",
+            description: "Navigate a realistic malware infection scenario from detection to resolution",
+            timeEstimate: "10 minutes"
+          },
+          {
+            title: "Data Breach Response",
+            description: "Respond to a simulated data breach with proper escalation and documentation",
+            timeEstimate: "8 minutes"
+          },
+          {
+            title: "Communication Protocol",
+            description: "Practice incident communication using proper channels and messaging",
+            timeEstimate: "5 minutes"
+          }
+        ]
+      }
     },
     {
       id: 4,
@@ -44,7 +245,70 @@ export default function TrainingScenarios() {
       completed: true,
       type: "interactive",
       topics: ["Passwords", "MFA", "Account Security"],
-    },
+      steps: 7,
+      content: {
+        overview: "Build strong account security through effective password management and multi-factor authentication. Learn to create unbreakable passwords and implement additional security layers.",
+        objectives: [
+          "Create strong, unique passwords for all accounts",
+          "Understand and implement multi-factor authentication",
+          "Use password managers effectively",
+          "Recognize and avoid password-related threats",
+          "Maintain good password hygiene across all systems"
+        ],
+        modules: [
+          {
+            title: "Password Fundamentals",
+            content: "Understand what makes a password strong and why password security is critical in modern cybersecurity.",
+            keyPoints: [
+              "Length is more important than complexity",
+              "Unique passwords for every account",
+              "Avoid personal information in passwords",
+              "Password complexity vs. passphrase strategies",
+              "Common password attacks: brute force, dictionary, credential stuffing"
+            ]
+          },
+          {
+            title: "Multi-Factor Authentication (MFA)",
+            content: "Learn how MFA provides additional security layers beyond just passwords.",
+            keyPoints: [
+              "Something you know (password)",
+              "Something you have (phone, token, smartcard)",
+              "Something you are (biometrics)",
+              "SMS vs. App-based vs. Hardware tokens",
+              "Recovery codes and backup authentication methods"
+            ]
+          },
+          {
+            title: "Password Management Tools",
+            content: "Discover how password managers can significantly improve your security posture while making password management easier.",
+            keyPoints: [
+              "Generate unique, complex passwords automatically",
+              "Secure encrypted storage of credentials",
+              "Cross-device synchronization",
+              "Breach monitoring and password health checks",
+              "Popular options: 1Password, Bitwarden, Dashlane, LastPass"
+            ]
+          }
+        ],
+        practicalExercises: [
+          {
+            title: "Password Strength Assessment",
+            description: "Evaluate password strength and learn improvement techniques",
+            timeEstimate: "5 minutes"
+          },
+          {
+            title: "MFA Setup Practice",
+            description: "Walk through setting up MFA on common platforms and applications",
+            timeEstimate: "8 minutes"
+          },
+          {
+            title: "Password Manager Demo",
+            description: "Experience how password managers work and their security benefits",
+            timeEstimate: "4 minutes"
+          }
+        ]
+      }
+    }
   ];
 
   const getDifficultyColor = (difficulty: string) => {
@@ -70,6 +334,93 @@ export default function TrainingScenarios() {
         return <AlertTriangle className="h-4 w-4" />;
       default:
         return <BookOpen className="h-4 w-4" />;
+    }
+  };
+
+  const handleStartTraining = (scenario: any) => {
+    setSelectedScenario(scenario);
+    setCurrentStep(0);
+    setShowTrainingDialog(true);
+  };
+
+  const handleNextStep = () => {
+    if (currentStep < selectedScenario.steps - 1) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const handlePrevStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const getStepContent = (scenario: any, step: number) => {
+    if (!scenario?.content) return null;
+
+    switch (step) {
+      case 0:
+        return (
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Training Overview</h3>
+            <p className="text-gray-600">{scenario.content.overview}</p>
+            <div>
+              <h4 className="font-medium mb-2">Learning Objectives:</h4>
+              <ul className="list-disc list-inside space-y-1">
+                {scenario.content.objectives?.map((obj: string, index: number) => (
+                  <li key={index} className="text-sm text-gray-600">{obj}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        );
+      case 1:
+      case 2:
+      case 3:
+        const moduleIndex = step - 1;
+        const module = scenario.content.modules?.[moduleIndex];
+        if (!module) return null;
+        return (
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">{module.title}</h3>
+            <p className="text-gray-600">{module.content}</p>
+            <div>
+              <h4 className="font-medium mb-2">Key Points:</h4>
+              <ul className="list-disc list-inside space-y-1">
+                {module.keyPoints?.map((point: string, index: number) => (
+                  <li key={index} className="text-sm text-gray-600">{point}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        );
+      default:
+        const exerciseIndex = step - 4;
+        const exercise = scenario.content.practicalExercises?.[exerciseIndex];
+        if (!exercise) return (
+          <div className="text-center space-y-4">
+            <CheckCircle className="h-12 w-12 text-cyber-success mx-auto" />
+            <h3 className="text-lg font-semibold">Training Complete!</h3>
+            <p className="text-gray-600">You've successfully completed the {scenario.title} training module.</p>
+            <Badge className="bg-cyber-success bg-opacity-20 text-cyber-success">
+              Certificate Earned
+            </Badge>
+          </div>
+        );
+        return (
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Practical Exercise</h3>
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <h4 className="font-medium text-blue-900">{exercise.title}</h4>
+              <p className="text-blue-800 mt-1">{exercise.description}</p>
+              <p className="text-sm text-blue-600 mt-2">Estimated time: {exercise.timeEstimate}</p>
+            </div>
+            <Button className="w-full bg-cyber-primary hover:bg-blue-700">
+              <Play className="h-4 w-4 mr-2" />
+              Start Exercise
+            </Button>
+          </div>
+        );
     }
   };
 
@@ -172,6 +523,7 @@ export default function TrainingScenarios() {
                   variant={scenario.completed ? "outline" : "default"}
                   size="sm"
                   className={!scenario.completed ? "bg-cyber-primary hover:bg-blue-700" : ""}
+                  onClick={() => handleStartTraining(scenario)}
                 >
                   {scenario.completed ? "Review" : "Start Training"}
                 </Button>
@@ -219,6 +571,200 @@ export default function TrainingScenarios() {
                 <p className="text-sm text-gray-500">Master complex security challenges</p>
               </div>
               <div className="w-5 h-5"></div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Training Dialog */}
+      <Dialog open={showTrainingDialog} onOpenChange={setShowTrainingDialog}>
+        <DialogContent className="max-w-4xl max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center space-x-2">
+              {selectedScenario && getTypeIcon(selectedScenario.type)}
+              <span>{selectedScenario?.title}</span>
+              <Badge className={selectedScenario && getDifficultyColor(selectedScenario.difficulty)}>
+                {selectedScenario?.difficulty}
+              </Badge>
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedScenario && (
+            <div className="space-y-6">
+              {/* Progress Bar */}
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Progress</span>
+                  <span>{Math.round(((currentStep + 1) / selectedScenario.steps) * 100)}%</span>
+                </div>
+                <Progress value={((currentStep + 1) / selectedScenario.steps) * 100} />
+                <p className="text-xs text-gray-500">
+                  Step {currentStep + 1} of {selectedScenario.steps}
+                </p>
+              </div>
+
+              {/* Training Content */}
+              <ScrollArea className="h-96">
+                <div className="pr-4">
+                  {getStepContent(selectedScenario, currentStep)}
+                </div>
+              </ScrollArea>
+
+              {/* Navigation */}
+              <div className="flex justify-between items-center pt-4 border-t">
+                <Button
+                  variant="outline"
+                  onClick={handlePrevStep}
+                  disabled={currentStep === 0}
+                >
+                  Previous
+                </Button>
+                
+                <div className="flex space-x-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowTrainingDialog(false)}
+                  >
+                    Exit Training
+                  </Button>
+                  
+                  {currentStep < selectedScenario.steps - 1 ? (
+                    <Button
+                      onClick={handleNextStep}
+                      className="bg-cyber-primary hover:bg-blue-700"
+                    >
+                      Next
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={() => {
+                        // Mark scenario as completed
+                        setShowTrainingDialog(false);
+                        // Here you would typically update the backend
+                      }}
+                      className="bg-cyber-success hover:bg-green-700"
+                    >
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Complete Training
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Training Resources */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <FileText className="h-5 w-5" />
+            <span>Training Resources & Materials</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="border rounded-lg p-4">
+              <div className="flex items-center space-x-2 mb-2">
+                <Mail className="h-5 w-5 text-blue-600" />
+                <h4 className="font-medium">Email Security Guide</h4>
+              </div>
+              <p className="text-sm text-gray-600 mb-3">Comprehensive guide to email security best practices</p>
+              <Button variant="outline" size="sm" className="w-full">
+                <Download className="h-4 w-4 mr-2" />
+                Download PDF
+              </Button>
+            </div>
+
+            <div className="border rounded-lg p-4">
+              <div className="flex items-center space-x-2 mb-2">
+                <Shield className="h-5 w-5 text-green-600" />
+                <h4 className="font-medium">Incident Response Playbook</h4>
+              </div>
+              <p className="text-sm text-gray-600 mb-3">Step-by-step incident response procedures and checklists</p>
+              <Button variant="outline" size="sm" className="w-full">
+                <Download className="h-4 w-4 mr-2" />
+                Download PDF
+              </Button>
+            </div>
+
+            <div className="border rounded-lg p-4">
+              <div className="flex items-center space-x-2 mb-2">
+                <Key className="h-5 w-5 text-purple-600" />
+                <h4 className="font-medium">Password Policy Template</h4>
+              </div>
+              <p className="text-sm text-gray-600 mb-3">Organizational password policy template and guidelines</p>
+              <Button variant="outline" size="sm" className="w-full">
+                <Download className="h-4 w-4 mr-2" />
+                Download PDF
+              </Button>
+            </div>
+
+            <div className="border rounded-lg p-4">
+              <div className="flex items-center space-x-2 mb-2">
+                <Users className="h-5 w-5 text-orange-600" />
+                <h4 className="font-medium">Social Engineering Defense</h4>
+              </div>
+              <p className="text-sm text-gray-600 mb-3">Training materials for recognizing social engineering attacks</p>
+              <Button variant="outline" size="sm" className="w-full">
+                <Download className="h-4 w-4 mr-2" />
+                Download PDF
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Quick Reference Cards */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Quick Reference Cards</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <h4 className="font-medium text-red-900 mb-2">🚨 Phishing Red Flags</h4>
+              <ul className="text-sm text-red-800 space-y-1">
+                <li>• Urgent language and time pressure</li>
+                <li>• Requests for credentials or personal info</li>
+                <li>• Unexpected attachments or links</li>
+                <li>• Sender address doesn't match organization</li>
+                <li>• Poor grammar and spelling errors</li>
+              </ul>
+            </div>
+
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+              <h4 className="font-medium text-green-900 mb-2">✅ Safe Email Practices</h4>
+              <ul className="text-sm text-green-800 space-y-1">
+                <li>• Verify sender through separate channel</li>
+                <li>• Hover over links to check destinations</li>
+                <li>• Don't download unexpected attachments</li>
+                <li>• Report suspicious emails to IT</li>
+                <li>• Use organization's secure communication</li>
+              </ul>
+            </div>
+
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h4 className="font-medium text-blue-900 mb-2">🔒 Strong Password Checklist</h4>
+              <ul className="text-sm text-blue-800 space-y-1">
+                <li>• At least 12 characters long</li>
+                <li>• Unique for every account</li>
+                <li>• Use a password manager</li>
+                <li>• Enable multi-factor authentication</li>
+                <li>• Avoid personal information</li>
+              </ul>
+            </div>
+
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <h4 className="font-medium text-yellow-900 mb-2">⚡ Incident Response Steps</h4>
+              <ul className="text-sm text-yellow-800 space-y-1">
+                <li>• Document what you observe</li>
+                <li>• Don't panic or act hastily</li>
+                <li>• Notify security team immediately</li>
+                <li>• Preserve evidence - don't delete</li>
+                <li>• Follow organization procedures</li>
+              </ul>
             </div>
           </div>
         </CardContent>

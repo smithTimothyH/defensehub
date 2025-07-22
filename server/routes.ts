@@ -89,13 +89,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const simulationData = insertSimulationSchema.parse(req.body);
       const simulation = await storage.createSimulation(simulationData);
       
-      // Log audit trail
-      await storage.createAuditLog({
-        userId: simulationData.createdBy,
-        action: 'create_simulation',
-        resource: 'simulation',
-        details: { simulationId: simulation.id, type: simulation.type }
-      });
+
       
       res.json(simulation);
     } catch (error) {
@@ -187,16 +181,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get audit logs
-  app.get("/api/audit-logs", async (req, res) => {
-    try {
-      const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
-      const logs = await storage.getAuditLogs(limit);
-      res.json(logs);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch audit logs" });
-    }
-  });
+
 
   // Get user interactions
   app.get("/api/users/:id/interactions", async (req, res) => {
@@ -242,12 +227,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Log the email attempt
-      await storage.recordAuditLog({
-        action: "send_phishing_email",
-        userId: req.body.userId || null,
-        resource: `email:${to}`,
-        details: { scenarioType: scenario.type }
-      });
+
 
       const result = await emailService.sendPhishingSimulation(to, scenario);
       res.json(result);
@@ -265,12 +245,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Missing required fields: to, reportData" });
       }
 
-      await storage.recordAuditLog({
-        action: "send_compliance_report",
-        userId: req.body.userId || null,
-        resource: `email:${Array.isArray(to) ? to.join(',') : to}`,
-        details: { reportType: "compliance" }
-      });
+
 
       const result = await emailService.sendComplianceReport(to, reportData);
       res.json(result);
@@ -288,12 +263,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Missing required fields: to, alertData" });
       }
 
-      await storage.recordAuditLog({
-        action: "send_security_alert",
-        userId: req.body.userId || null,
-        resource: `email:${Array.isArray(to) ? to.join(',') : to}`,
-        details: { alertTitle: alertData.title, severity: alertData.severity }
-      });
+
 
       const result = await emailService.sendSecurityAlert(to, alertData);
       res.json(result);
@@ -311,12 +281,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Missing required fields: to, subject, text" });
       }
 
-      await storage.recordAuditLog({
-        action: "send_email",
-        userId: req.body.userId || null,
-        resource: `email:${Array.isArray(to) ? to.join(',') : to}`,
-        details: { subject }
-      });
+
 
       const result = await emailService.sendEmail(to, subject, text, html);
       res.json(result);
@@ -371,19 +336,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         fileSize: `${Math.round(JSON.stringify(reportData).length / 1024)}KB`
       });
 
-      // Log report generation
-      await storage.createAuditLog({
-        userId: null,
-        action: 'generate_report',
-        resource: `report:${savedReport.id}`,
-        details: { 
-          reportId: savedReport.id,
-          templateId, 
-          title: savedReport.title,
-          format: savedReport.format,
-          generatedAt: savedReport.createdAt?.toISOString()
-        }
-      });
+
 
       res.json({
         success: true,

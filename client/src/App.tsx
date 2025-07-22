@@ -10,7 +10,7 @@ import PhishingSimulator from "@/pages/phishing-simulator";
 import TrainingScenarios from "@/pages/training-scenarios";
 import CrisisSimulation from "@/pages/crisis-simulation";
 import Reports from "@/pages/reports";
-import AuditTrail from "@/pages/audit-trail";
+
 
 import EmailCenter from "@/pages/email-center";
 import PhishingCaught from "@/pages/phishing-caught";
@@ -24,8 +24,6 @@ function Router() {
       <Route path="/training-scenarios" component={TrainingScenarios} />
       <Route path="/crisis-simulation" component={CrisisSimulation} />
       <Route path="/reports" component={Reports} />
-      <Route path="/audit-trail" component={AuditTrail} />
-
       <Route path="/email-center" component={EmailCenter} />
       <Route path="/phishing-caught" component={PhishingCaught} />
       <Route component={NotFound} />

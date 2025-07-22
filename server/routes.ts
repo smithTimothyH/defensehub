@@ -103,11 +103,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(simulation);
     } catch (error) {
       console.error("Simulation creation error:", error);
-      if (error.name === 'ZodError') {
-        console.error("Validation errors:", error.errors);
-        res.status(400).json({ message: "Invalid simulation data", errors: error.errors });
-      } else {
+      if (error instanceof Error && error.name === 'ZodError') {
+        console.error("Validation errors:", (error as any).errors);
+        res.status(400).json({ message: "Invalid simulation data", errors: (error as any).errors });
+      } else if (error instanceof Error) {
         res.status(400).json({ message: "Invalid simulation data", error: error.message });
+      } else {
+        res.status(500).json({ message: "Failed to create simulation" });
       }
     }
   });
@@ -899,7 +901,7 @@ async function generateExecutiveSummaryReport(dateRange: any) {
   return {
     title: "Executive Security Summary - Sample Report",
     period: dateRange || "Last 30 days",
-    overallSecurityScore: stats.securityScore || 78,
+    overallSecurityScore: stats.knowledgeScore || 78,
     keyRisks: [
       "Email phishing susceptibility higher than industry average",
       "Password security training completion below target",

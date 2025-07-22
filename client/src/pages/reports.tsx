@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -9,11 +9,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { FileText, Download, TrendingUp, BarChart, PieChart, LineChart, Settings, Calendar, Users, Target, Shield, AlertTriangle, CheckCircle, Clock } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { FileText, Download, TrendingUp, BarChart, PieChart, LineChart, Settings, Calendar, Users, Target, Shield, AlertTriangle, CheckCircle, Clock, Loader2 } from "lucide-react";
 
 export default function Reports() {
   const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
   const [showCustomizeDialog, setShowCustomizeDialog] = useState(false);
+  const { toast } = useToast();
   
   const { data: simulations } = useQuery({
     queryKey: ["/api/simulations"],
@@ -22,6 +25,51 @@ export default function Reports() {
   const { data: stats } = useQuery({
     queryKey: ["/api/dashboard/stats"],
   });
+
+  const generateReportMutation = useMutation({
+    mutationFn: async (reportConfig: any) => {
+      const response = await apiRequest("POST", "/api/reports/generate", reportConfig);
+      return await response.json();
+    },
+    onSuccess: (data: any) => {
+      toast({
+        title: "Report Generated Successfully",
+        description: `${data.report?.title || 'Report'} has been generated and is ready for download.`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Report Generation Failed",
+        description: error.message || "Unable to generate report. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleGenerateReport = async (templateId: string, title?: string, customizations?: any) => {
+    const reportConfig = {
+      templateId,
+      title,
+      customizations,
+      format: "pdf",
+      dateRange: "last-30-days"
+    };
+    
+    generateReportMutation.mutate(reportConfig);
+  };
+
+  const handleCustomReportGeneration = async (formData: any) => {
+    const reportConfig = {
+      templateId: selectedTemplate?.id,
+      title: formData.title || selectedTemplate?.title,
+      customizations: formData.customizations,
+      format: formData.format || "pdf",
+      dateRange: formData.dateRange
+    };
+    
+    generateReportMutation.mutate(reportConfig);
+    setShowCustomizeDialog(false);
+  };
 
   const reportTypes = [
     {
@@ -392,7 +440,17 @@ export default function Reports() {
                               <Button variant="outline" onClick={() => setShowCustomizeDialog(false)}>
                                 Cancel
                               </Button>
-                              <Button className="bg-cyber-primary hover:bg-blue-700">
+                              <Button 
+                                className="bg-cyber-primary hover:bg-blue-700"
+                                onClick={() => handleCustomReportGeneration({ 
+                                  title: selectedTemplate?.title,
+                                  format: "pdf" 
+                                })}
+                                disabled={generateReportMutation.isPending}
+                              >
+                                {generateReportMutation.isPending && (
+                                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                )}
                                 Generate Custom Report
                               </Button>
                             </div>
@@ -401,8 +459,16 @@ export default function Reports() {
                       </DialogContent>
                     </Dialog>
                     
-                    <Button className="flex-1 bg-cyber-primary hover:bg-blue-700">
-                      <FileText className="h-4 w-4 mr-2" />
+                    <Button 
+                      className="flex-1 bg-cyber-primary hover:bg-blue-700"
+                      onClick={() => handleGenerateReport(report.id, report.title)}
+                      disabled={generateReportMutation.isPending}
+                    >
+                      {generateReportMutation.isPending ? (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      ) : (
+                        <FileText className="h-4 w-4 mr-2" />
+                      )}
                       Generate Report
                     </Button>
                   </div>

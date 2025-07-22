@@ -325,5 +325,197 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Report Generation API Routes
+  
+  // Generate report endpoint
+  app.post("/api/reports/generate", async (req, res) => {
+    try {
+      const { templateId, title, customizations, format, dateRange } = req.body;
+      
+      // Generate report data based on template type
+      let reportData;
+      switch (templateId) {
+        case 'executive-summary':
+          reportData = await generateExecutiveSummaryReport(dateRange);
+          break;
+        case 'security-awareness':
+          reportData = await generateSecurityAwarenessReport(dateRange);
+          break;
+        case 'phishing-campaign':
+          reportData = await generatePhishingCampaignReport(dateRange);
+          break;
+        case 'incident-response':
+          reportData = await generateIncidentResponseReport(dateRange);
+          break;
+        case 'compliance-audit':
+          reportData = await generateComplianceAuditReport(dateRange);
+          break;
+        case 'risk-assessment':
+          reportData = await generateRiskAssessmentReport(dateRange);
+          break;
+        default:
+          return res.status(400).json({ message: "Unknown template type" });
+      }
+
+      // Log report generation
+      await storage.createAuditLog({
+        userId: null,
+        action: 'generate_report',
+        resource: `report:${templateId}`,
+        details: { 
+          templateId, 
+          title: title || reportData.title,
+          format: format || 'pdf',
+          generatedAt: new Date().toISOString()
+        }
+      });
+
+      res.json({
+        success: true,
+        report: {
+          id: Math.random().toString(36).substring(7),
+          title: title || reportData.title,
+          type: templateId,
+          format: format || 'pdf',
+          generatedAt: new Date().toISOString(),
+          downloadUrl: `/api/reports/download/${templateId}`,
+          data: reportData
+        }
+      });
+    } catch (error) {
+      console.error('Report generation error:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Failed to generate report",
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Download report endpoint (simulated)
+  app.get("/api/reports/download/:templateId", async (req, res) => {
+    try {
+      const { templateId } = req.params;
+      const format = req.query.format || 'pdf';
+      
+      // In a real implementation, this would generate and return the actual file
+      // For now, we'll return a success message
+      res.json({
+        success: true,
+        message: `${templateId} report ready for download`,
+        format,
+        downloadStarted: true
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to download report" });
+    }
+  });
+
   return httpServer;
+}
+
+// Helper functions to generate report data
+async function generateExecutiveSummaryReport(dateRange: any) {
+  const stats = await storage.getDashboardStats();
+  return {
+    title: "Executive Security Summary",
+    period: dateRange || "Last 30 days",
+    overallSecurityScore: stats.securityScore || 78,
+    keyRisks: [
+      "Email phishing susceptibility higher than industry average",
+      "Password security training completion below target",
+      "Incident response time needs improvement"
+    ],
+    trainingEffectiveness: 85,
+    budgetImpact: "$12,500 savings from reduced security incidents",
+    recommendations: [
+      "Increase phishing simulation frequency",
+      "Implement advanced password policies",
+      "Conduct quarterly crisis response drills"
+    ]
+  };
+}
+
+async function generateSecurityAwarenessReport(dateRange: any) {
+  return {
+    title: "Security Awareness Performance Report",
+    period: dateRange || "Last quarter",
+    completionRate: 92,
+    averageScore: 84,
+    topPerformingDepartments: ["IT", "Finance", "Legal"],
+    areasForImprovement: ["Email security", "Physical security"],
+    behaviorChangeIndicators: {
+      phishingReportRate: 68,
+      passwordPolicyCompliance: 91,
+      securityIncidentReduction: 34
+    }
+  };
+}
+
+async function generatePhishingCampaignReport(dateRange: any) {
+  const simulations = await storage.getSimulations();
+  return {
+    title: "Phishing Simulation Analysis",
+    period: dateRange || "Last campaign",
+    totalCampaigns: simulations.length,
+    overallClickRate: 15,
+    reportingRate: 45,
+    improvementTrend: "+12% reporting increase",
+    riskCategories: {
+      high: 8,
+      medium: 23,
+      low: 45
+    }
+  };
+}
+
+async function generateIncidentResponseReport(dateRange: any) {
+  return {
+    title: "Incident Response Readiness Assessment",
+    period: dateRange || "Semi-annual review",
+    averageResponseTime: "18 minutes",
+    communicationEffectiveness: 78,
+    decisionQuality: 82,
+    readinessScore: 80,
+    recommendedActions: [
+      "Update communication protocols",
+      "Conduct more frequent drills",
+      "Improve escalation procedures"
+    ]
+  };
+}
+
+async function generateComplianceAuditReport(dateRange: any) {
+  const metrics = await storage.getComplianceMetrics();
+  return {
+    title: "Compliance Documentation Report",
+    period: dateRange || "Annual audit",
+    frameworks: metrics.length > 0 ? metrics : [
+      { name: "NIST", score: 85 },
+      { name: "ISO 27001", score: 78 },
+      { name: "SOC 2", score: 91 }
+    ],
+    overallCompliance: 84,
+    documentsReviewed: 156,
+    controlsImplemented: 89,
+    gapsIdentified: 12
+  };
+}
+
+async function generateRiskAssessmentReport(dateRange: any) {
+  return {
+    title: "Cybersecurity Risk Assessment",
+    period: dateRange || "Quarterly assessment",
+    overallRiskScore: 68,
+    criticalRisks: 3,
+    highRisks: 12,
+    mediumRisks: 28,
+    lowRisks: 45,
+    topThreats: [
+      "Email-based attacks",
+      "Credential compromise", 
+      "Social engineering"
+    ],
+    mitigationProgress: 75
+  };
 }

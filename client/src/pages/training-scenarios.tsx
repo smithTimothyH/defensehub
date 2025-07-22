@@ -278,13 +278,104 @@ export default function TrainingScenarios() {
                   className="bg-cyber-primary hover:bg-blue-700"
                   onClick={() => handleStartTraining(scenario)}
                 >
-                  {scenario.completed ? "Review" : "Start Training"}
+                  Start Training
                 </Button>
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
+
+      {/* Training Dialog */}
+      <Dialog open={showTrainingDialog} onOpenChange={setShowTrainingDialog}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center space-x-2">
+              <GraduationCap className="h-5 w-5 text-cyber-primary" />
+              <span>{selectedScenario?.title}</span>
+            </DialogTitle>
+            <DialogDescription>
+              {selectedScenario?.description}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-6">
+            {/* Training Content */}
+            <Card>
+              <CardContent className="p-6">
+                <div className="text-center space-y-4">
+                  <div className="w-16 h-16 bg-cyber-primary/10 rounded-full flex items-center justify-center mx-auto">
+                    {getTypeIcon(selectedScenario?.type)}
+                  </div>
+                  <h3 className="text-xl font-semibold">Interactive Training Module</h3>
+                  <p className="text-gray-600 max-w-md mx-auto">
+                    This {selectedScenario?.difficulty.toLowerCase()} level training covers essential {selectedScenario?.topics.join(", ").toLowerCase()} concepts through hands-on exercises and real-world scenarios.
+                  </p>
+                  
+                  <div className="grid grid-cols-3 gap-4 mt-6">
+                    <div className="text-center">
+                      <Clock className="h-8 w-8 text-blue-600 mx-auto mb-2" />
+                      <div className="font-medium text-blue-900">{selectedScenario?.duration}</div>
+                      <div className="text-sm text-gray-600">Duration</div>
+                    </div>
+                    <div className="text-center">
+                      <Target className="h-8 w-8 text-green-600 mx-auto mb-2" />
+                      <div className="font-medium text-green-900">{selectedScenario?.steps} Steps</div>
+                      <div className="text-sm text-gray-600">Learning Modules</div>
+                    </div>
+                    <div className="text-center">
+                      <Award className="h-8 w-8 text-purple-600 mx-auto mb-2" />
+                      <div className="font-medium text-purple-900">125 XP</div>
+                      <div className="text-sm text-gray-600">Experience Points</div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Topics Covered */}
+            <div className="space-y-3">
+              <h4 className="font-medium text-gray-900">Topics Covered</h4>
+              <div className="flex flex-wrap gap-2">
+                {selectedScenario?.topics.map((topic: string) => (
+                  <Badge key={topic} variant="outline" className="text-xs">
+                    {topic}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+
+            {/* Learning Objectives */}
+            <div className="space-y-3">
+              <h4 className="font-medium text-gray-900">Learning Objectives</h4>
+              <div className="space-y-2 text-sm text-gray-600">
+                <div className="flex items-start space-x-2">
+                  <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                  <span>Identify and recognize security threats in real-world scenarios</span>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                  <span>Apply best practices for cybersecurity awareness</span>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                  <span>Develop skills for incident response and reporting</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex space-x-3 justify-end">
+              <Button variant="outline" onClick={() => setShowTrainingDialog(false)}>
+                Close
+              </Button>
+              <Button className="bg-cyber-primary hover:bg-blue-700">
+                <Play className="h-4 w-4 mr-2" />
+                Begin Training
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Achievements Dialog */}
       <Dialog open={showAchievements} onOpenChange={setShowAchievements}>

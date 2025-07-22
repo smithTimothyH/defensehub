@@ -587,7 +587,12 @@ export default function TrainingScenarios() {
                 <h4 className="font-medium">Email Security Guide</h4>
               </div>
               <p className="text-sm text-gray-600 mb-3">Comprehensive guide to email security best practices</p>
-              <Button variant="outline" size="sm" className="w-full">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full"
+                onClick={() => window.open('/api/training-resources/email-security/download', '_blank')}
+              >
                 <Download className="h-4 w-4 mr-2" />
                 Download PDF
               </Button>
@@ -599,7 +604,12 @@ export default function TrainingScenarios() {
                 <h4 className="font-medium">Incident Response Playbook</h4>
               </div>
               <p className="text-sm text-gray-600 mb-3">Step-by-step incident response procedures and checklists</p>
-              <Button variant="outline" size="sm" className="w-full">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full"
+                onClick={() => window.open('/api/training-resources/incident-response/download', '_blank')}
+              >
                 <Download className="h-4 w-4 mr-2" />
                 Download PDF
               </Button>
@@ -611,7 +621,12 @@ export default function TrainingScenarios() {
                 <h4 className="font-medium">Password Policy Template</h4>
               </div>
               <p className="text-sm text-gray-600 mb-3">Organizational password policy template and guidelines</p>
-              <Button variant="outline" size="sm" className="w-full">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full"
+                onClick={() => window.open('/api/training-resources/password-policy/download', '_blank')}
+              >
                 <Download className="h-4 w-4 mr-2" />
                 Download PDF
               </Button>
@@ -623,7 +638,12 @@ export default function TrainingScenarios() {
                 <h4 className="font-medium">Social Engineering Defense</h4>
               </div>
               <p className="text-sm text-gray-600 mb-3">Training materials for recognizing social engineering attacks</p>
-              <Button variant="outline" size="sm" className="w-full">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full"
+                onClick={() => window.open('/api/training-resources/social-engineering/download', '_blank')}
+              >
                 <Download className="h-4 w-4 mr-2" />
                 Download PDF
               </Button>

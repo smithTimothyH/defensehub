@@ -3,11 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
-import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { GraduationCap, BookOpen, Target, CheckCircle, Clock, AlertTriangle, Play, FileText, Users, Shield, Mail, Key, Phone, ExternalLink, Download } from "lucide-react";
+import { GraduationCap, BookOpen, Target, CheckCircle, Clock, AlertTriangle, Play, FileText, Users, Shield, Mail, Key, Download } from "lucide-react";
 
 export default function TrainingScenarios() {
   const [selectedScenario, setSelectedScenario] = useState<any>(null);
@@ -127,17 +124,6 @@ export default function TrainingScenarios() {
               "Social media reconnaissance and pretexting",
               "USB drops and baiting attacks"
             ]
-          },
-          {
-            title: "Defense Strategies",
-            content: "Develop practical defense mechanisms and verification procedures to protect against social engineering.",
-            keyPoints: [
-              "Always verify identity through independent channels",
-              "Question unusual requests, especially for sensitive information",
-              "Be skeptical of unsolicited contact",
-              "Follow established procedures for information sharing",
-              "Report suspicious interactions to security team"
-            ]
           }
         ],
         practicalExercises: [
@@ -150,11 +136,6 @@ export default function TrainingScenarios() {
             title: "Pretext Recognition",
             description: "Identify social engineering attempts in realistic business scenarios",
             timeEstimate: "7 minutes"
-          },
-          {
-            title: "Verification Protocol Practice",
-            description: "Practice proper verification procedures for suspicious requests",
-            timeEstimate: "5 minutes"
           }
         ]
       }
@@ -176,8 +157,7 @@ export default function TrainingScenarios() {
           "Execute proper incident response procedures",
           "Communicate effectively during security incidents",
           "Document incidents thoroughly for investigation",
-          "Coordinate with relevant teams and stakeholders",
-          "Preserve digital evidence and maintain chain of custody"
+          "Coordinate with relevant teams and stakeholders"
         ],
         modules: [
           {
@@ -188,32 +168,7 @@ export default function TrainingScenarios() {
               "Data breaches and unauthorized access",
               "Denial of service and system outages",
               "Insider threats and data exfiltration",
-              "Physical security breaches",
-              "Severity classification: Critical, High, Medium, Low"
-            ]
-          },
-          {
-            title: "Immediate Response Actions",
-            content: "Master the critical first steps that must be taken immediately upon discovering a security incident.",
-            keyPoints: [
-              "DO NOT panic or act hastily",
-              "Isolate affected systems if safe to do so",
-              "Document the current state with screenshots",
-              "Notify the security team immediately",
-              "Preserve all evidence - don't delete anything",
-              "Begin maintaining an incident timeline"
-            ]
-          },
-          {
-            title: "Communication and Escalation",
-            content: "Understand proper communication channels and escalation procedures during security incidents.",
-            keyPoints: [
-              "Use secure communication channels only",
-              "Follow the incident response communication tree",
-              "Provide clear, factual information",
-              "Avoid speculation or assumptions",
-              "Regular status updates to stakeholders",
-              "External communication must be pre-approved"
+              "Physical security breaches"
             ]
           }
         ],
@@ -227,11 +182,6 @@ export default function TrainingScenarios() {
             title: "Data Breach Response",
             description: "Respond to a simulated data breach with proper escalation and documentation",
             timeEstimate: "8 minutes"
-          },
-          {
-            title: "Communication Protocol",
-            description: "Practice incident communication using proper channels and messaging",
-            timeEstimate: "5 minutes"
           }
         ]
       }
@@ -252,8 +202,7 @@ export default function TrainingScenarios() {
           "Create strong, unique passwords for all accounts",
           "Understand and implement multi-factor authentication",
           "Use password managers effectively",
-          "Recognize and avoid password-related threats",
-          "Maintain good password hygiene across all systems"
+          "Recognize and avoid password-related threats"
         ],
         modules: [
           {
@@ -263,30 +212,7 @@ export default function TrainingScenarios() {
               "Length is more important than complexity",
               "Unique passwords for every account",
               "Avoid personal information in passwords",
-              "Password complexity vs. passphrase strategies",
-              "Common password attacks: brute force, dictionary, credential stuffing"
-            ]
-          },
-          {
-            title: "Multi-Factor Authentication (MFA)",
-            content: "Learn how MFA provides additional security layers beyond just passwords.",
-            keyPoints: [
-              "Something you know (password)",
-              "Something you have (phone, token, smartcard)",
-              "Something you are (biometrics)",
-              "SMS vs. App-based vs. Hardware tokens",
-              "Recovery codes and backup authentication methods"
-            ]
-          },
-          {
-            title: "Password Management Tools",
-            content: "Discover how password managers can significantly improve your security posture while making password management easier.",
-            keyPoints: [
-              "Generate unique, complex passwords automatically",
-              "Secure encrypted storage of credentials",
-              "Cross-device synchronization",
-              "Breach monitoring and password health checks",
-              "Popular options: 1Password, Bitwarden, Dashlane, LastPass"
+              "Password complexity vs. passphrase strategies"
             ]
           }
         ],
@@ -300,11 +226,6 @@ export default function TrainingScenarios() {
             title: "MFA Setup Practice",
             description: "Walk through setting up MFA on common platforms and applications",
             timeEstimate: "8 minutes"
-          },
-          {
-            title: "Password Manager Demo",
-            description: "Experience how password managers work and their security benefits",
-            timeEstimate: "4 minutes"
           }
         ]
       }
@@ -344,7 +265,7 @@ export default function TrainingScenarios() {
   };
 
   const handleNextStep = () => {
-    if (currentStep < selectedScenario.steps - 1) {
+    if (selectedScenario && currentStep < selectedScenario.steps - 1) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -604,11 +525,9 @@ export default function TrainingScenarios() {
               </div>
 
               {/* Training Content */}
-              <ScrollArea className="h-96">
-                <div className="pr-4">
-                  {getStepContent(selectedScenario, currentStep)}
-                </div>
-              </ScrollArea>
+              <div className="max-h-96 overflow-y-auto pr-4">
+                {getStepContent(selectedScenario, currentStep)}
+              </div>
 
               {/* Navigation */}
               <div className="flex justify-between items-center pt-4 border-t">
@@ -638,9 +557,7 @@ export default function TrainingScenarios() {
                   ) : (
                     <Button
                       onClick={() => {
-                        // Mark scenario as completed
                         setShowTrainingDialog(false);
-                        // Here you would typically update the backend
                       }}
                       className="bg-cyber-success hover:bg-green-700"
                     >

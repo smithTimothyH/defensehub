@@ -551,6 +551,16 @@ function generateHTMLReport(report: any): string {
             color: #64748b; 
             font-size: 0.9rem;
         }
+        .sample-notice { 
+            background: #fef3c7; 
+            border: 2px solid #f59e0b; 
+            border-radius: 8px; 
+            padding: 1rem; 
+            margin-bottom: 2rem; 
+            text-align: center; 
+            color: #92400e; 
+            font-weight: 600;
+        }
         .status-badge { 
             display: inline-block; 
             padding: 0.25rem 0.75rem; 
@@ -585,7 +595,7 @@ function generateHTMLReport(report: any): string {
             <div class="logo">
                 <img src="${logoBase64}" alt="DefenseHub" style="height: 40px;">
             </div>
-            <h1 class="title">${report.title}</h1>
+            <h1 class="title">${report.title} - Sample Report</h1>
             <p class="subtitle">Generated on ${new Date(report.createdAt).toLocaleDateString('en-US', { 
                 year: 'numeric', 
                 month: 'long', 
@@ -593,16 +603,19 @@ function generateHTMLReport(report: any): string {
                 hour: '2-digit',
                 minute: '2-digit'
             })}</p>
-            <p class="subtitle">Report Period: ${data.period || 'Last 30 days'}</p>
+            <p class="subtitle">Report Period: ${data.period || 'Last 30 days'} • <strong>SAMPLE DATA FOR DEMONSTRATION</strong></p>
         </div>
 
         <div class="content">
+            <div class="sample-notice">
+                📋 <strong>SAMPLE REPORT</strong> - This report contains demonstration data for portfolio showcase purposes
+            </div>
             ${generateReportContent(report)}
         </div>
 
         <div class="footer">
             <p><strong>DefenseHub</strong> - AI-Driven Cybersecurity Awareness Platform</p>
-            <p>This report was automatically generated and contains confidential information.</p>
+            <p><strong>SAMPLE REPORT:</strong> This report contains demonstration data for portfolio showcase purposes.</p>
             <p>Report ID: ${report.id} | Format: ${report.format} | Status: ${report.status}</p>
         </div>
     </div>
@@ -919,10 +932,10 @@ function generateRiskAssessmentContent(data: any): string {
 function generateDefaultContent(data: any): string {
   return `
     <div class="section">
-        <h2 class="section-title">Report Summary</h2>
-        <p>This report contains security analysis and recommendations for your organization.</p>
+        <h2 class="section-title">Sample Report Summary</h2>
+        <p>This sample report demonstrates security analysis and recommendations capabilities for portfolio showcase.</p>
         <div class="chart-placeholder">
-            📊 Report Data Visualization
+            📊 Sample Report Data Visualization
         </div>
     </div>
   `;
@@ -932,7 +945,7 @@ function generateDefaultContent(data: any): string {
 async function generateExecutiveSummaryReport(dateRange: any) {
   const stats = await storage.getDashboardStats();
   return {
-    title: "Executive Security Summary",
+    title: "Executive Security Summary - Sample Report",
     period: dateRange || "Last 30 days",
     overallSecurityScore: stats.securityScore || 78,
     keyRisks: [
@@ -952,7 +965,7 @@ async function generateExecutiveSummaryReport(dateRange: any) {
 
 async function generateSecurityAwarenessReport(dateRange: any) {
   return {
-    title: "Security Awareness Performance Report",
+    title: "Security Awareness Performance - Sample Report",
     period: dateRange || "Last quarter",
     completionRate: 92,
     averageScore: 84,
@@ -969,7 +982,7 @@ async function generateSecurityAwarenessReport(dateRange: any) {
 async function generatePhishingCampaignReport(dateRange: any) {
   const simulations = await storage.getSimulations();
   return {
-    title: "Phishing Simulation Analysis",
+    title: "Phishing Simulation Analysis - Sample Report",
     period: dateRange || "Last campaign",
     totalCampaigns: simulations.length,
     overallClickRate: 15,
@@ -985,7 +998,7 @@ async function generatePhishingCampaignReport(dateRange: any) {
 
 async function generateIncidentResponseReport(dateRange: any) {
   return {
-    title: "Incident Response Readiness Assessment",
+    title: "Incident Response Readiness - Sample Report",
     period: dateRange || "Semi-annual review",
     averageResponseTime: "18 minutes",
     communicationEffectiveness: 78,
@@ -1002,7 +1015,7 @@ async function generateIncidentResponseReport(dateRange: any) {
 async function generateComplianceAuditReport(dateRange: any) {
   const metrics = await storage.getComplianceMetrics();
   return {
-    title: "Compliance Documentation Report",
+    title: "Compliance Documentation - Sample Report",
     period: dateRange || "Annual audit",
     frameworks: metrics.length > 0 ? metrics : [
       { name: "NIST", score: 85 },
@@ -1018,7 +1031,7 @@ async function generateComplianceAuditReport(dateRange: any) {
 
 async function generateRiskAssessmentReport(dateRange: any) {
   return {
-    title: "Cybersecurity Risk Assessment",
+    title: "Cybersecurity Risk Assessment - Sample Report",
     period: dateRange || "Quarterly assessment",
     overallRiskScore: 68,
     criticalRisks: 3,

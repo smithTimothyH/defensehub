@@ -524,8 +524,8 @@ export default function Reports() {
           {reportsData.length === 0 ? (
             <div className="text-center py-8">
               <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No Reports Generated Yet</h3>
-              <p className="text-gray-500 mb-4">Generate your first report using the templates above.</p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No Sample Reports Generated Yet</h3>
+              <p className="text-gray-500 mb-4">Generate your first sample report using the templates above to see DefenseHub's reporting capabilities.</p>
               <Button className="bg-cyber-primary hover:bg-blue-700" onClick={() => handleGenerateReport('executive-summary', 'Executive Security Summary')}>
                 <FileText className="h-4 w-4 mr-2" />
                 Generate Sample Report
@@ -540,7 +540,7 @@ export default function Reports() {
                       <FileText className="h-5 w-5 text-cyber-success" />
                     </div>
                     <div>
-                      <h4 className="font-medium text-gray-900">{report.title}</h4>
+                      <h4 className="font-medium text-gray-900">{report.title} <span className="text-xs text-amber-600 bg-amber-100 px-2 py-1 rounded">SAMPLE</span></h4>
                       <p className="text-sm text-gray-500">
                         {getReportTypeLabel(report.type)} • Generated {formatDate(report.createdAt)} • {report.fileSize}
                       </p>

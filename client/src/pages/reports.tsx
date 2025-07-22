@@ -1,11 +1,20 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, Download, TrendingUp, BarChart, PieChart, LineChart } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { FileText, Download, TrendingUp, BarChart, PieChart, LineChart, Settings, Calendar, Users, Target, Shield, AlertTriangle, CheckCircle, Clock } from "lucide-react";
 
 export default function Reports() {
+  const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
+  const [showCustomizeDialog, setShowCustomizeDialog] = useState(false);
+  
   const { data: simulations } = useQuery({
     queryKey: ["/api/simulations"],
   });
@@ -16,33 +25,119 @@ export default function Reports() {
 
   const reportTypes = [
     {
-      id: "security-awareness",
-      title: "Security Awareness Report",
-      description: "Comprehensive analysis of user training performance and security posture",
+      id: "executive-summary",
+      title: "Executive Security Summary",
+      description: "High-level overview of organizational security posture for leadership",
+      icon: Target,
+      category: "Executive",
+      frequency: "Monthly",
+      duration: "5-10 min read",
+      metrics: ["Overall Security Score", "Key Risk Indicators", "Budget Impact", "Strategic Recommendations"],
+      sections: [
+        "Executive Summary",
+        "Security Score Overview", 
+        "Top 5 Security Risks",
+        "Training Effectiveness",
+        "Budget & ROI Analysis",
+        "Strategic Recommendations"
+      ],
+      customizable: ["Date Range", "Departments", "Risk Threshold", "Executive Recipients"]
+    },
+    {
+      id: "security-awareness", 
+      title: "Security Awareness Performance",
+      description: "Comprehensive analysis of user training completion and learning effectiveness",
       icon: BarChart,
-      metrics: ["User Performance", "Training Completion", "Risk Assessment"],
+      category: "Training",
+      frequency: "Quarterly", 
+      duration: "15-20 min read",
+      metrics: ["Training Completion Rates", "Knowledge Retention", "Behavioral Change", "Department Performance"],
+      sections: [
+        "Training Program Overview",
+        "Completion Statistics by Department",
+        "Learning Effectiveness Metrics", 
+        "Knowledge Retention Analysis",
+        "Behavioral Change Indicators",
+        "Recommendations for Improvement"
+      ],
+      customizable: ["Training Modules", "Date Range", "Department Filter", "Performance Thresholds"]
     },
     {
       id: "phishing-campaign",
-      title: "Phishing Campaign Analysis",
-      description: "Detailed breakdown of phishing simulation results and user responses",
+      title: "Phishing Simulation Analysis", 
+      description: "Detailed analysis of phishing campaign results and user susceptibility",
       icon: PieChart,
-      metrics: ["Click Rates", "Report Rates", "User Behavior"],
+      category: "Simulation",
+      frequency: "Per Campaign",
+      duration: "10-15 min read", 
+      metrics: ["Click Rates", "Reporting Rates", "User Susceptibility", "Improvement Trends"],
+      sections: [
+        "Campaign Overview & Methodology",
+        "Click Rate Analysis by Department",
+        "Reporting Response Times", 
+        "User Susceptibility Patterns",
+        "Repeat Offender Analysis",
+        "Training Recommendations"
+      ],
+      customizable: ["Campaign Selection", "Department Comparison", "Risk Categorization", "Anonymization Level"]
+    },
+    {
+      id: "incident-response",
+      title: "Incident Response Readiness",
+      description: "Assessment of organizational preparedness for security incidents",
+      icon: AlertTriangle,
+      category: "Compliance",
+      frequency: "Semi-Annual",
+      duration: "20-25 min read",
+      metrics: ["Response Time", "Communication Effectiveness", "Decision Quality", "Recovery Speed"],
+      sections: [
+        "Incident Response Capability Assessment",
+        "Crisis Simulation Results",
+        "Communication Protocol Effectiveness",
+        "Decision-Making Analysis", 
+        "Recovery Time Objectives",
+        "Readiness Improvement Plan"
+      ],
+      customizable: ["Incident Types", "Team Roles", "Communication Channels", "Severity Levels"]
     },
     {
       id: "compliance-audit",
-      title: "Compliance Audit Trail",
-      description: "Full audit documentation for regulatory compliance requirements",
+      title: "Compliance Documentation Report",
+      description: "Comprehensive documentation for regulatory compliance and audit requirements",
       icon: FileText,
-      metrics: ["Policy Adherence", "Training Records", "Incident Response"],
+      category: "Compliance", 
+      frequency: "Annual",
+      duration: "30-45 min read",
+      metrics: ["Policy Adherence", "Training Records", "Audit Trail", "Control Effectiveness"],
+      sections: [
+        "Regulatory Framework Overview",
+        "Policy Compliance Status",
+        "Training Documentation & Records",
+        "Security Control Implementation",
+        "Audit Trail & Evidence",
+        "Gaps & Remediation Plan"
+      ],
+      customizable: ["Regulatory Framework", "Audit Period", "Control Selection", "Evidence Types"]
     },
     {
-      id: "crisis-response",
-      title: "Crisis Response Performance",
-      description: "Analysis of decision-making and response times during crisis simulations",
-      icon: TrendingUp,
-      metrics: ["Response Times", "Decision Quality", "Communication"],
-    },
+      id: "risk-assessment",
+      title: "Cybersecurity Risk Assessment",
+      description: "Detailed analysis of identified risks, threats, and organizational vulnerabilities",
+      icon: Shield,
+      category: "Risk Management",
+      frequency: "Quarterly",
+      duration: "25-30 min read", 
+      metrics: ["Risk Scores", "Threat Landscape", "Vulnerability Assessment", "Mitigation Status"],
+      sections: [
+        "Risk Assessment Methodology",
+        "Threat Landscape Analysis",
+        "Vulnerability Identification",
+        "Risk Scoring & Prioritization",
+        "Mitigation Strategy Status",
+        "Residual Risk Analysis"
+      ],
+      customizable: ["Risk Categories", "Threat Sources", "Impact Scenarios", "Mitigation Timeline"]
+    }
   ];
 
   const recentReports = [
@@ -135,47 +230,179 @@ export default function Reports() {
 
       {/* Report Templates */}
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Report Templates</h3>
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900">Report Templates</h3>
+            <p className="text-sm text-gray-600">Professional templates for different audiences and use cases</p>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Select defaultValue="all">
+              <SelectTrigger className="w-40">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                <SelectItem value="executive">Executive</SelectItem>
+                <SelectItem value="training">Training</SelectItem>
+                <SelectItem value="simulation">Simulation</SelectItem>
+                <SelectItem value="compliance">Compliance</SelectItem>
+                <SelectItem value="risk">Risk Management</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {reportTypes.map((report) => {
             const Icon = report.icon;
             return (
-              <Card key={report.id}>
+              <Card key={report.id} className="hover:shadow-md transition-shadow">
                 <CardHeader>
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <Icon className="h-5 w-5 text-cyber-primary" />
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <Icon className="h-6 w-6 text-cyber-primary" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-lg">{report.title}</CardTitle>
+                        <p className="text-sm text-gray-600 mt-1">{report.description}</p>
+                      </div>
                     </div>
-                    <div>
-                      <CardTitle className="text-lg">{report.title}</CardTitle>
-                      <p className="text-sm text-gray-600">{report.description}</p>
-                    </div>
+                    <Badge variant="outline" className="text-xs">
+                      {report.category}
+                    </Badge>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center space-x-1">
+                      <Calendar className="h-4 w-4 text-gray-500" />
+                      <span className="text-gray-600">{report.frequency}</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <Clock className="h-4 w-4 text-gray-500" />
+                      <span className="text-gray-600">{report.duration}</span>
+                    </div>
+                  </div>
+                  
                   <div>
-                    <p className="text-sm font-medium text-gray-700 mb-2">Includes:</p>
-                    <div className="flex flex-wrap gap-2">
-                      {report.metrics.map((metric) => (
+                    <p className="text-sm font-medium text-gray-700 mb-2">Key Metrics:</p>
+                    <div className="flex flex-wrap gap-1">
+                      {report.metrics.slice(0, 3).map((metric) => (
                         <Badge key={metric} variant="outline" className="text-xs">
                           {metric}
                         </Badge>
                       ))}
+                      {report.metrics.length > 3 && (
+                        <Badge variant="outline" className="text-xs">
+                          +{report.metrics.length - 3} more
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <p className="text-sm font-medium text-gray-700 mb-2">Report Sections:</p>
+                    <div className="text-xs text-gray-600 space-y-1">
+                      {report.sections.slice(0, 3).map((section, index) => (
+                        <div key={index} className="flex items-center space-x-2">
+                          <CheckCircle className="h-3 w-3 text-cyber-success" />
+                          <span>{section}</span>
+                        </div>
+                      ))}
+                      {report.sections.length > 3 && (
+                        <div className="text-gray-500 ml-5">
+                          +{report.sections.length - 3} additional sections
+                        </div>
+                      )}
                     </div>
                   </div>
                   
                   <div className="flex items-center space-x-2">
-                    <Select defaultValue="pdf">
-                      <SelectTrigger className="w-24">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="pdf">PDF</SelectItem>
-                        <SelectItem value="excel">Excel</SelectItem>
-                        <SelectItem value="csv">CSV</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Dialog open={showCustomizeDialog && selectedTemplate?.id === report.id} onOpenChange={setShowCustomizeDialog}>
+                      <DialogTrigger asChild>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => setSelectedTemplate(report)}
+                        >
+                          <Settings className="h-4 w-4 mr-2" />
+                          Customize
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-2xl">
+                        <DialogHeader>
+                          <DialogTitle>Customize {report.title}</DialogTitle>
+                        </DialogHeader>
+                        {selectedTemplate && (
+                          <div className="space-y-6">
+                            <div>
+                              <Label className="text-sm font-medium">Report Title</Label>
+                              <Input 
+                                defaultValue={selectedTemplate.title}
+                                className="mt-2"
+                              />
+                            </div>
+                            
+                            <div>
+                              <Label className="text-sm font-medium">Customization Options</Label>
+                              <div className="grid grid-cols-2 gap-4 mt-2">
+                                {selectedTemplate.customizable?.map((option: string) => (
+                                  <div key={option} className="flex items-center space-x-2">
+                                    <Checkbox id={option} defaultChecked />
+                                    <Label htmlFor={option} className="text-sm">{option}</Label>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                            
+                            <div>
+                              <Label className="text-sm font-medium">Date Range</Label>
+                              <div className="grid grid-cols-2 gap-2 mt-2">
+                                <Input type="date" placeholder="Start Date" />
+                                <Input type="date" placeholder="End Date" />
+                              </div>
+                            </div>
+                            
+                            <div>
+                              <Label className="text-sm font-medium">Additional Notes</Label>
+                              <Textarea 
+                                placeholder="Add any specific requirements or notes for this report..."
+                                className="mt-2"
+                                rows={3}
+                              />
+                            </div>
+                            
+                            <div>
+                              <Label className="text-sm font-medium">Output Format</Label>
+                              <Select defaultValue="pdf">
+                                <SelectTrigger className="mt-2">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="pdf">PDF Report</SelectItem>
+                                  <SelectItem value="excel">Excel Workbook</SelectItem>
+                                  <SelectItem value="powerpoint">PowerPoint Presentation</SelectItem>
+                                  <SelectItem value="csv">CSV Data Export</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            
+                            <div className="flex justify-end space-x-2">
+                              <Button variant="outline" onClick={() => setShowCustomizeDialog(false)}>
+                                Cancel
+                              </Button>
+                              <Button className="bg-cyber-primary hover:bg-blue-700">
+                                Generate Custom Report
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+                      </DialogContent>
+                    </Dialog>
+                    
                     <Button className="flex-1 bg-cyber-primary hover:bg-blue-700">
+                      <FileText className="h-4 w-4 mr-2" />
                       Generate Report
                     </Button>
                   </div>

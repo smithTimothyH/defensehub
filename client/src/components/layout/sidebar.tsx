@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Shield, BarChart3, Fish, GraduationCap, AlertTriangle, FileText, ClipboardList, Scale, Users, Settings, Mail } from "lucide-react";
+import { Shield, BarChart3, Fish, GraduationCap, AlertTriangle, FileText, ClipboardList, Users, Settings, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navigation = [
@@ -9,7 +9,7 @@ const navigation = [
   { name: "Crisis Simulation", href: "/crisis-simulation", icon: AlertTriangle, category: "Main" },
   { name: "Reports", href: "/reports", icon: FileText, category: "Analytics" },
   { name: "Audit Trail", href: "/audit-trail", icon: ClipboardList, category: "Analytics" },
-  { name: "Compliance", href: "/compliance", icon: Scale, category: "Analytics" },
+
   { name: "Email Center", href: "/email-center", icon: Mail, category: "Analytics" },
   { name: "User Management", href: "/users", icon: Users, category: "System" },
   { name: "Settings", href: "/settings", icon: Settings, category: "System" },

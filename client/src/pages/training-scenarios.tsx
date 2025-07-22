@@ -339,13 +339,12 @@ export default function TrainingScenarios() {
             <Button 
               className="w-full bg-cyber-primary hover:bg-blue-700"
               onClick={() => {
-                // Start the practical exercise
                 if (exercise.title === "Phone Call Simulation") {
-                  alert("Phone Call Simulation Exercise\n\nScenario: You receive a call from someone claiming to be from IT support asking for your login credentials to 'fix a security issue'.\n\nYour task: Identify the red flags and determine the appropriate response.\n\nRed flags to look for:\n• Unsolicited call asking for credentials\n• Creating urgency ('security issue')\n• Requesting sensitive information over phone\n\nCorrect response: Hang up and verify through official IT channels.");
+                  alert("PHONE CALL SIMULATION EXERCISE\n\nSCENARIO:\nYou receive a call from someone claiming to be from IT support asking for your login credentials to fix a security issue.\n\nTASK:\nIdentify the red flags and determine the appropriate response.\n\nRED FLAGS:\n• Unsolicited call asking for credentials\n• Creating urgency (security issue)\n• Requesting sensitive information over phone\n\nCORRECT RESPONSE:\nHang up and verify through official IT channels.\n\nREMEMBER: Legitimate IT never asks for passwords over the phone!");
                 } else if (exercise.title === "Pretext Recognition") {
-                  alert("Pretext Recognition Exercise\n\nScenario: An email claims to be from your CEO requesting urgent wire transfer information for a 'confidential acquisition'.\n\nYour task: Analyze the email for social engineering tactics.\n\nSocial engineering tactics:\n• Authority (claiming to be CEO)\n• Urgency (urgent request)\n• Secrecy (confidential acquisition)\n• Financial request (wire transfer)\n\nCorrect response: Verify through separate communication channel before taking any action.");
+                  alert("PRETEXT RECOGNITION EXERCISE\n\nSCENARIO:\nAn email claims to be from your CEO requesting urgent wire transfer information for a confidential acquisition.\n\nTASK:\nAnalyze the email for social engineering tactics.\n\nSOCIAL ENGINEERING TACTICS:\n• Authority (claiming to be CEO)\n• Urgency (urgent request)\n• Secrecy (confidential acquisition)\n• Financial request (wire transfer)\n\nCORRECT RESPONSE:\nVerify through separate communication channel before taking any action.\n\nREMEMBER: Always verify high-stakes requests through known contact methods!");
                 } else {
-                  alert(`Starting ${exercise.title} exercise...\n\nThis interactive exercise will help you practice identifying and responding to social engineering attacks in a safe environment.`);
+                  alert(`TRAINING EXERCISE: ${exercise.title.toUpperCase()}\n\nThis interactive exercise will help you practice identifying and responding to social engineering attacks in a safe environment.\n\nClick OK to begin the exercise.`);
                 }
               }}
             >

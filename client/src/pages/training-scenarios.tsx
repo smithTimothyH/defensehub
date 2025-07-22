@@ -441,12 +441,11 @@ export default function TrainingScenarios() {
                 </div>
                 
                 <Button 
-                  variant={scenario.completed ? "outline" : "default"}
                   size="sm"
-                  className={!scenario.completed ? "bg-cyber-primary hover:bg-blue-700" : ""}
+                  className="bg-cyber-primary hover:bg-blue-700"
                   onClick={() => handleStartTraining(scenario)}
                 >
-                  {scenario.completed ? "Review" : "Start Training"}
+                  Start Training
                 </Button>
               </div>
             </CardContent>

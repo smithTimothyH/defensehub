@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
+import { useToast } from "@/hooks/use-toast";
 import { GraduationCap, BookOpen, Target, CheckCircle, Clock, AlertTriangle, Play, FileText, Users, Shield, Mail, Key, Download, Award, Star, TrendingUp, ChevronRight, ChevronLeft, Brain, Trophy, Crown, Flame, Zap, Medal } from "lucide-react";
 
 export default function TrainingScenarios() {
@@ -20,8 +21,8 @@ export default function TrainingScenarios() {
   const [exerciseScore, setExerciseScore] = useState(0);
   const [showResults, setShowResults] = useState(false);
   const [showAchievements, setShowAchievements] = useState(false);
-
-  const scenarios = [
+  const { toast } = useToast();
+  const [scenarios, setScenarios] = useState([
     {
       id: 1,
       title: "Email Security Fundamentals",
@@ -66,7 +67,7 @@ export default function TrainingScenarios() {
       topics: ["Passwords", "Authentication", "Security"],
       steps: 5
     }
-  ];
+  ]);
 
   // Calculate real progress from actual data
   const completedScenarios = scenarios.filter(s => s.completed).length;
@@ -133,6 +134,25 @@ export default function TrainingScenarios() {
     setSelectedAnswer("");
     setExerciseScore(0);
     setShowResults(false);
+  };
+
+  const completeTraining = (scenarioId: number) => {
+    const scenario = scenarios.find(s => s.id === scenarioId);
+    if (scenario && !scenario.completed) {
+      setScenarios(prevScenarios => 
+        prevScenarios.map(s => 
+          s.id === scenarioId 
+            ? { ...s, completed: true }
+            : s
+        )
+      );
+      
+      // Show XP reward notification
+      toast({
+        title: "Training Complete! 🎉",
+        description: "+125 XP earned! Keep learning to unlock more achievements.",
+      });
+    }
   };
 
   const getExerciseTitle = (moduleTitle: string, step: number) => {
@@ -779,6 +799,9 @@ export default function TrainingScenarios() {
                     </div>
                     <Button 
                       onClick={() => {
+                        if (currentExercise) {
+                          completeTraining(currentExercise.id);
+                        }
                         setShowExerciseModal(false);
                         setShowResults(false);
                       }}

@@ -13,6 +13,7 @@ import Reports from "@/pages/reports";
 import AuditTrail from "@/pages/audit-trail";
 import Compliance from "@/pages/compliance";
 import EmailCenter from "@/pages/email-center";
+import PhishingCaught from "@/pages/phishing-caught";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -26,6 +27,7 @@ function Router() {
       <Route path="/audit-trail" component={AuditTrail} />
       <Route path="/compliance" component={Compliance} />
       <Route path="/email-center" component={EmailCenter} />
+      <Route path="/phishing-caught" component={PhishingCaught} />
       <Route component={NotFound} />
     </Switch>
   );

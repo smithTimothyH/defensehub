@@ -61,7 +61,7 @@ export class EmailService {
 
 We've detected suspicious activity on your account. Please verify your credentials immediately to prevent unauthorized access.
 
-Click here to secure your account: ${scenario.targetUrl}
+Click here to secure your account: ${process.env.REPLIT_DOMAINS ? `https://${process.env.REPLIT_DOMAINS.split(',')[0]}/phishing-caught` : 'https://example.com/phishing-caught'}
 
 This is time-sensitive - please act within the next 2 hours.
 
@@ -76,7 +76,7 @@ IT Security Team`,
               <p>Dear Employee,</p>
               <p>We've detected <strong>suspicious activity</strong> on your account. Please verify your credentials immediately to prevent unauthorized access.</p>
               <div style="text-align: center; margin: 30px 0;">
-                <a href="${scenario.targetUrl}" style="background-color: #dc2626; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">Secure Your Account Now</a>
+                <a href="${process.env.REPLIT_DOMAINS ? `https://${process.env.REPLIT_DOMAINS.split(',')[0]}/phishing-caught` : 'https://example.com/phishing-caught'}" style="background-color: #dc2626; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">Secure Your Account Now</a>
               </div>
               <p style="color: #dc2626; font-weight: bold;">⏰ This is time-sensitive - please act within the next 2 hours.</p>
               <p>Best regards,<br>IT Security Team</p>
@@ -90,7 +90,7 @@ IT Security Team`,
 
 A critical security update is available for your work applications. Please install it immediately to maintain system security.
 
-Download the update: ${scenario.targetUrl}
+Download the update: ${process.env.REPLIT_DOMAINS ? `https://${process.env.REPLIT_DOMAINS.split(',')[0]}/phishing-caught` : 'https://example.com/phishing-caught'}
 
 Installation must be completed by end of business today.
 
@@ -104,7 +104,7 @@ IT Department`,
               <p>Hello,</p>
               <p>A <strong>critical security update</strong> is available for your work applications. Please install it immediately to maintain system security.</p>
               <div style="text-align: center; margin: 30px 0;">
-                <a href="${scenario.targetUrl}" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px;">Download Update</a>
+                <a href="${process.env.REPLIT_DOMAINS ? `https://${process.env.REPLIT_DOMAINS.split(',')[0]}/phishing-caught` : 'https://example.com/phishing-caught'}" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px;">Download Update</a>
               </div>
               <p><strong>Installation must be completed by end of business today.</strong></p>
               <p>IT Department</p>
@@ -118,7 +118,7 @@ IT Department`,
 
 Your invoice #INV-2024-0892 for $1,247.99 is now overdue. Please review and make payment immediately to avoid service interruption.
 
-View Invoice: ${scenario.targetUrl}
+View Invoice: ${process.env.REPLIT_DOMAINS ? `https://${process.env.REPLIT_DOMAINS.split(',')[0]}/phishing-caught` : 'https://example.com/phishing-caught'}
 
 Payment due: 3 days overdue
 Amount: $1,247.99
@@ -137,7 +137,7 @@ Accounts Receivable`,
                 <strong>Amount Due:</strong> $1,247.99</p>
               </div>
               <div style="text-align: center; margin: 30px 0;">
-                <a href="${scenario.targetUrl}" style="background-color: #f59e0b; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px;">View Invoice</a>
+                <a href="${process.env.REPLIT_DOMAINS ? `https://${process.env.REPLIT_DOMAINS.split(',')[0]}/phishing-caught` : 'https://example.com/phishing-caught'}" style="background-color: #f59e0b; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px;">View Invoice</a>
               </div>
               <p>Please make payment immediately to avoid service interruption.</p>
               <p>Accounts Receivable</p>

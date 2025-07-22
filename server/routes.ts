@@ -87,6 +87,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/simulations", async (req, res) => {
     try {
       console.log("Received simulation data:", JSON.stringify(req.body, null, 2));
+      
+      // Ensure user exists
+      const user = await storage.getUser(req.body.createdBy);
+      if (!user) {
+        return res.status(400).json({ message: "Invalid user ID. User does not exist." });
+      }
+      
       const simulationData = insertSimulationSchema.parse(req.body);
       console.log("Parsed simulation data:", JSON.stringify(simulationData, null, 2));
       const simulation = await storage.createSimulation(simulationData);

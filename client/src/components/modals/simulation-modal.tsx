@@ -71,7 +71,7 @@ export default function SimulationModal({ isOpen, onClose, actionType }: Simulat
         actionType,
       },
       targetAudience,
-      createdBy: 1, // Default user ID for demo
+      createdBy: 2, // Use existing demo user ID
     };
 
     createSimulationMutation.mutate(simulationData);

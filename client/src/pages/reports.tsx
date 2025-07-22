@@ -26,6 +26,10 @@ export default function Reports() {
     queryKey: ["/api/dashboard/stats"],
   });
 
+  const { data: reportsData = [], refetch: refetchReports } = useQuery({
+    queryKey: ["/api/reports"],
+  });
+
   const generateReportMutation = useMutation({
     mutationFn: async (reportConfig: any) => {
       const response = await apiRequest("POST", "/api/reports/generate", reportConfig);
@@ -36,6 +40,8 @@ export default function Reports() {
         title: "Report Generated Successfully",
         description: `${data.report?.title || 'Report'} has been generated and is ready for download.`,
       });
+      // Refresh the reports list to show the new report
+      refetchReports();
     },
     onError: (error: any) => {
       toast({
@@ -69,6 +75,31 @@ export default function Reports() {
     
     generateReportMutation.mutate(reportConfig);
     setShowCustomizeDialog(false);
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffHours / 24);
+    
+    if (diffHours < 1) return "Just now";
+    if (diffHours < 24) return `${diffHours} hours ago`;
+    if (diffDays === 1) return "1 day ago";
+    return `${diffDays} days ago`;
+  };
+
+  const getReportTypeLabel = (type: string) => {
+    const typeMap = {
+      'executive-summary': 'Executive Summary',
+      'security-awareness': 'Security Awareness',
+      'phishing-campaign': 'Campaign Analysis', 
+      'incident-response': 'Incident Response',
+      'compliance-audit': 'Compliance Audit',
+      'risk-assessment': 'Risk Assessment'
+    };
+    return typeMap[type as keyof typeof typeMap] || type;
   };
 
   const reportTypes = [
@@ -483,39 +514,58 @@ export default function Reports() {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>Recent Reports</CardTitle>
-            <Button variant="outline" size="sm">
-              View All Reports
+            <CardTitle>Recent Reports ({reportsData.length})</CardTitle>
+            <Button variant="outline" size="sm" onClick={() => refetchReports()}>
+              Refresh Reports
             </Button>
           </div>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {recentReports.map((report) => (
-              <div key={report.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                <div className="flex items-center space-x-4">
-                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                    <FileText className="h-5 w-5 text-cyber-success" />
+          {reportsData.length === 0 ? (
+            <div className="text-center py-8">
+              <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No Reports Generated Yet</h3>
+              <p className="text-gray-500 mb-4">Generate your first report using the templates above.</p>
+              <Button className="bg-cyber-primary hover:bg-blue-700" onClick={() => handleGenerateReport('executive-summary', 'Executive Security Summary')}>
+                <FileText className="h-4 w-4 mr-2" />
+                Generate Sample Report
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {reportsData.slice(0, 5).map((report: any) => (
+                <div key={report.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                      <FileText className="h-5 w-5 text-cyber-success" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900">{report.title}</h4>
+                      <p className="text-sm text-gray-500">
+                        {getReportTypeLabel(report.type)} • Generated {formatDate(report.createdAt)} • {report.fileSize}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="font-medium text-gray-900">{report.title}</h4>
-                    <p className="text-sm text-gray-500">
-                      {report.type} • Generated {report.generatedAt} • {report.size}
-                    </p>
+                  <div className="flex items-center space-x-3">
+                    <Badge variant="secondary" className="bg-cyber-success bg-opacity-20 text-cyber-success">
+                      {report.status}
+                    </Badge>
+                    <Button variant="outline" size="sm" onClick={() => window.open(report.downloadUrl, '_blank')}>
+                      <Download className="h-4 w-4 mr-2" />
+                      Download
+                    </Button>
                   </div>
                 </div>
-                <div className="flex items-center space-x-3">
-                  <Badge variant="secondary" className="bg-cyber-success bg-opacity-20 text-cyber-success">
-                    {report.status}
-                  </Badge>
-                  <Button variant="outline" size="sm">
-                    <Download className="h-4 w-4 mr-2" />
-                    Download
+              ))}
+              {reportsData.length > 5 && (
+                <div className="text-center pt-4">
+                  <Button variant="outline" className="w-full">
+                    View All {reportsData.length} Reports
                   </Button>
                 </div>
-              </div>
-            ))}
-          </div>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

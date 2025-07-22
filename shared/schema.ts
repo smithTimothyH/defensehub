@@ -83,6 +83,21 @@ export const auditLogs = pgTable("audit_logs", {
   timestamp: timestamp("timestamp").defaultNow().notNull(),
 });
 
+export const reports = pgTable("reports", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  templateId: text("template_id").notNull(),
+  type: text("type").notNull(), // executive-summary, security-awareness, etc.
+  format: text("format").notNull().default("pdf"), // pdf, excel, csv, powerpoint
+  status: text("status").notNull().default("completed"), // generating, completed, failed
+  data: jsonb("data").notNull(), // Report data/content
+  customizations: jsonb("customizations"), // User customizations
+  generatedBy: integer("generated_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  downloadUrl: text("download_url"),
+  fileSize: text("file_size"),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   simulations: many(simulations),
@@ -191,6 +206,11 @@ export const insertAuditLogSchema = createInsertSchema(auditLogs).omit({
   timestamp: true,
 });
 
+export const insertReportSchema = createInsertSchema(reports).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -207,3 +227,5 @@ export type ComplianceMetric = typeof complianceMetrics.$inferSelect;
 export type InsertComplianceMetric = z.infer<typeof insertComplianceMetricSchema>;
 export type AuditLog = typeof auditLogs.$inferSelect;
 export type InsertAuditLog = z.infer<typeof insertAuditLogSchema>;
+export type Report = typeof reports.$inferSelect;
+export type InsertReport = z.infer<typeof insertReportSchema>;

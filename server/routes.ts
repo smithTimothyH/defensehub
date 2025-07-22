@@ -357,28 +357,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(400).json({ message: "Unknown template type" });
       }
 
+      // Save report to database
+      const savedReport = await storage.createReport({
+        title: title || reportData.title,
+        templateId,
+        type: templateId,
+        format: format || 'pdf',
+        status: 'completed',
+        data: reportData,
+        customizations,
+        generatedBy: null,
+        downloadUrl: `/api/reports/download/${templateId}`,
+        fileSize: `${Math.round(JSON.stringify(reportData).length / 1024)}KB`
+      });
+
       // Log report generation
       await storage.createAuditLog({
         userId: null,
         action: 'generate_report',
-        resource: `report:${templateId}`,
+        resource: `report:${savedReport.id}`,
         details: { 
+          reportId: savedReport.id,
           templateId, 
-          title: title || reportData.title,
-          format: format || 'pdf',
-          generatedAt: new Date().toISOString()
+          title: savedReport.title,
+          format: savedReport.format,
+          generatedAt: savedReport.createdAt?.toISOString()
         }
       });
 
       res.json({
         success: true,
         report: {
-          id: Math.random().toString(36).substring(7),
-          title: title || reportData.title,
-          type: templateId,
-          format: format || 'pdf',
-          generatedAt: new Date().toISOString(),
-          downloadUrl: `/api/reports/download/${templateId}`,
+          id: savedReport.id,
+          title: savedReport.title,
+          type: savedReport.type,
+          format: savedReport.format,
+          generatedAt: savedReport.createdAt?.toISOString(),
+          downloadUrl: savedReport.downloadUrl,
           data: reportData
         }
       });
@@ -389,6 +404,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: "Failed to generate report",
         error: error instanceof Error ? error.message : 'Unknown error'
       });
+    }
+  });
+
+  // Get all reports
+  app.get("/api/reports", async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 20;
+      const reportsData = await storage.getReports(limit);
+      res.json(reportsData);
+    } catch (error) {
+      console.error('Error fetching reports:', error);
+      res.status(500).json({ message: "Failed to fetch reports" });
     }
   });
 

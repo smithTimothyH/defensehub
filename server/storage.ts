@@ -1,10 +1,11 @@
 import { 
   users, simulations, simulationParticipants, phishingScenarios, 
-  userInteractions, coachingSessions, complianceMetrics, auditLogs,
+  userInteractions, coachingSessions, complianceMetrics, auditLogs, reports,
   type User, type InsertUser, type Simulation, type InsertSimulation,
   type PhishingScenario, type InsertPhishingScenario, type UserInteraction,
   type InsertUserInteraction, type CoachingSession, type InsertCoachingSession,
-  type ComplianceMetric, type InsertComplianceMetric, type AuditLog, type InsertAuditLog
+  type ComplianceMetric, type InsertComplianceMetric, type AuditLog, type InsertAuditLog,
+  type Report, type InsertReport
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
@@ -50,6 +51,12 @@ export interface IStorage {
     phishingAttempts: number;
     complianceRate: number;
   }>;
+
+  // Report operations
+  createReport(report: InsertReport): Promise<Report>;
+  getReports(limit?: number): Promise<Report[]>;
+  getReport(id: number): Promise<Report | undefined>;
+  updateReportStatus(id: number, status: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -177,6 +184,27 @@ export class DatabaseStorage implements IStorage {
       phishingAttempts: phishingAttempts.length,
       complianceRate: Math.round(avgCompliance),
     };
+  }
+
+  // Report operations
+  async createReport(insertReport: InsertReport): Promise<Report> {
+    const [report] = await db.insert(reports).values(insertReport).returning();
+    return report;
+  }
+
+  async getReports(limit: number = 10): Promise<Report[]> {
+    return await db.select().from(reports)
+      .orderBy(desc(reports.createdAt))
+      .limit(limit);
+  }
+
+  async getReport(id: number): Promise<Report | undefined> {
+    const [report] = await db.select().from(reports).where(eq(reports.id, id));
+    return report || undefined;
+  }
+
+  async updateReportStatus(id: number, status: string): Promise<void> {
+    await db.update(reports).set({ status }).where(eq(reports.id, id));
   }
 }
 

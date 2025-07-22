@@ -4,15 +4,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Fish, Zap, Play, AlertTriangle } from "lucide-react";
+import { Fish, Zap, Play, AlertTriangle, Eye, Users, Calendar, Target } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
 export default function PhishingSimulator() {
   const [selectedSimulation, setSelectedSimulation] = useState<number | null>(null);
   const [difficulty, setDifficulty] = useState("intermediate");
+  const [selectedCampaign, setSelectedCampaign] = useState<any>(null);
+  const [showDetailsDialog, setShowDetailsDialog] = useState(false);
+  const [showLaunchDialog, setShowLaunchDialog] = useState(false);
+  const [campaignName, setCampaignName] = useState("");
+  const [campaignEmails, setCampaignEmails] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -61,6 +68,77 @@ export default function PhishingSimulator() {
     generateScenarioMutation.mutate({
       simulationId: selectedSimulation,
       config,
+    });
+  };
+
+  const launchCampaignMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const emails = data.emails.split('\n').filter((email: string) => email.trim());
+      
+      // Launch campaign by sending emails
+      const responses = await Promise.all(
+        emails.map(async (email: string) => {
+          const response = await fetch('/api/email/phishing', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              to: email.trim(),
+              scenario: {
+                type: selectedCampaign?.configuration?.template || 'urgent-security',
+                targetUrl: 'https://example.com'
+              }
+            })
+          });
+          return response.json();
+        })
+      );
+      
+      return { responses, count: emails.length };
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Campaign Launched",
+        description: `Successfully sent ${data.count} phishing simulation emails.`,
+      });
+      setShowLaunchDialog(false);
+      setCampaignName("");
+      setCampaignEmails("");
+      queryClient.invalidateQueries({ queryKey: ["/api/simulations"] });
+    },
+    onError: () => {
+      toast({
+        title: "Launch Failed",
+        description: "Failed to launch phishing campaign. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleViewDetails = (simulation: any) => {
+    setSelectedCampaign(simulation);
+    setShowDetailsDialog(true);
+  };
+
+  const handleLaunchCampaign = (simulation: any) => {
+    setSelectedCampaign(simulation);
+    setCampaignName(simulation.name + " - " + new Date().toLocaleDateString());
+    setShowLaunchDialog(true);
+  };
+
+  const handleLaunchSubmit = () => {
+    if (!campaignEmails.trim()) {
+      toast({
+        title: "Missing Email Addresses",
+        description: "Please enter email addresses to send the campaign to.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    launchCampaignMutation.mutate({
+      campaignName,
+      emails: campaignEmails,
+      simulationId: selectedCampaign.id
     });
   };
 
@@ -169,10 +247,63 @@ export default function PhishingSimulator() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Active Phishing Campaigns</CardTitle>
-            <Button variant="outline" size="sm">
-              <Play className="h-4 w-4 mr-2" />
-              Launch New Campaign
-            </Button>
+            <Dialog open={showLaunchDialog} onOpenChange={setShowLaunchDialog}>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Play className="h-4 w-4 mr-2" />
+                  Launch New Campaign
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>Launch Phishing Campaign</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <Label>Campaign Name</Label>
+                    <Input 
+                      value={campaignName}
+                      onChange={(e) => setCampaignName(e.target.value)}
+                      placeholder="Enter campaign name"
+                    />
+                  </div>
+                  <div>
+                    <Label>Target Email Addresses</Label>
+                    <Textarea
+                      value={campaignEmails}
+                      onChange={(e) => setCampaignEmails(e.target.value)}
+                      placeholder="Enter email addresses (one per line)&#10;example1@company.com&#10;example2@company.com"
+                      rows={8}
+                      className="font-mono text-sm"
+                    />
+                    <p className="text-sm text-gray-500 mt-1">
+                      Enter one email address per line. The phishing simulation will be sent to all addresses.
+                    </p>
+                  </div>
+                  {selectedCampaign && (
+                    <div className="bg-blue-50 p-4 rounded-lg">
+                      <h4 className="font-medium text-blue-900">Selected Simulation:</h4>
+                      <p className="text-blue-800">{selectedCampaign.name}</p>
+                      <p className="text-sm text-blue-600">
+                        Difficulty: {selectedCampaign.configuration?.difficulty || 'intermediate'}
+                      </p>
+                    </div>
+                  )}
+                  <div className="flex justify-end space-x-2">
+                    <Button variant="outline" onClick={() => setShowLaunchDialog(false)}>
+                      Cancel
+                    </Button>
+                    <Button 
+                      onClick={handleLaunchSubmit}
+                      disabled={launchCampaignMutation.isPending}
+                      className="bg-cyber-primary hover:bg-blue-700"
+                    >
+                      {launchCampaignMutation.isPending ? "Launching..." : "Launch Campaign"}
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </CardHeader>
         <CardContent>
@@ -206,8 +337,22 @@ export default function PhishingSimulator() {
                       >
                         {simulation.status}
                       </Badge>
-                      <Button variant="outline" size="sm">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleViewDetails(simulation)}
+                      >
+                        <Eye className="h-4 w-4 mr-1" />
                         View Details
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleLaunchCampaign(simulation)}
+                        className="bg-green-50 text-green-700 hover:bg-green-100"
+                      >
+                        <Play className="h-4 w-4 mr-1" />
+                        Launch
                       </Button>
                     </div>
                   </div>
@@ -223,6 +368,105 @@ export default function PhishingSimulator() {
           )}
         </CardContent>
       </Card>
+
+      {/* Campaign Details Dialog */}
+      <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>{selectedCampaign?.name} - Campaign Details</DialogTitle>
+          </DialogHeader>
+          {selectedCampaign && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="flex items-center">
+                    <Target className="h-4 w-4 mr-2" />
+                    Target Audience
+                  </Label>
+                  <p className="text-sm bg-gray-50 p-2 rounded">
+                    {selectedCampaign.targetAudience?.join(", ") || "All Employees"}
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label className="flex items-center">
+                    <AlertTriangle className="h-4 w-4 mr-2" />
+                    Difficulty Level
+                  </Label>
+                  <Badge variant="secondary">
+                    {selectedCampaign.configuration?.difficulty || 'intermediate'}
+                  </Badge>
+                </div>
+                <div className="space-y-2">
+                  <Label className="flex items-center">
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Created
+                  </Label>
+                  <p className="text-sm bg-gray-50 p-2 rounded">
+                    {new Date(selectedCampaign.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label>Status</Label>
+                  <Badge 
+                    variant="secondary"
+                    className={
+                      selectedCampaign.status === "active" 
+                        ? "bg-cyber-success bg-opacity-20 text-cyber-success"
+                        : "bg-gray-500 bg-opacity-20 text-gray-500"
+                    }
+                  >
+                    {selectedCampaign.status}
+                  </Badge>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label>Template Type</Label>
+                <p className="text-sm bg-blue-50 p-3 rounded">
+                  <strong>{selectedCampaign.configuration?.template || 'urgent-security'}</strong>
+                  <br />
+                  <span className="text-gray-600">
+                    {selectedCampaign.configuration?.template === 'urgent-security' && 'Urgent security alert requiring immediate action'}
+                    {selectedCampaign.configuration?.template === 'software-update' && 'Critical software update notification'}
+                    {selectedCampaign.configuration?.template === 'invoice-scam' && 'Fake invoice payment request'}
+                  </span>
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Industry Context</Label>
+                <p className="text-sm bg-gray-50 p-2 rounded">
+                  {selectedCampaign.configuration?.industry || 'General'}
+                </p>
+              </div>
+
+              <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
+                <h4 className="font-medium text-yellow-800 mb-2">⚠️ Training Simulation</h4>
+                <p className="text-sm text-yellow-700">
+                  All emails sent from this simulation will include training disclaimers and link to educational content.
+                  No actual credentials or sensitive data will be collected.
+                </p>
+              </div>
+
+              <div className="flex justify-end space-x-2">
+                <Button variant="outline" onClick={() => setShowDetailsDialog(false)}>
+                  Close
+                </Button>
+                <Button 
+                  onClick={() => {
+                    setShowDetailsDialog(false);
+                    handleLaunchCampaign(selectedCampaign);
+                  }}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  <Play className="h-4 w-4 mr-2" />
+                  Launch Campaign
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

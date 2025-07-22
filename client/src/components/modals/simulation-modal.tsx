@@ -35,10 +35,11 @@ export default function SimulationModal({ isOpen, onClose, actionType }: Simulat
       queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
       onClose();
     },
-    onError: () => {
+    onError: (error: any) => {
+      console.error("Simulation creation error:", error);
       toast({
         title: "Error",
-        description: "Failed to create simulation. Please try again.",
+        description: `Failed to create simulation: ${error.message || "Please try again."}`,
         variant: "destructive",
       });
     },

@@ -86,14 +86,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create new simulation
   app.post("/api/simulations", async (req, res) => {
     try {
+      console.log("Received simulation data:", JSON.stringify(req.body, null, 2));
       const simulationData = insertSimulationSchema.parse(req.body);
+      console.log("Parsed simulation data:", JSON.stringify(simulationData, null, 2));
       const simulation = await storage.createSimulation(simulationData);
       
 
       
       res.json(simulation);
     } catch (error) {
-      res.status(400).json({ message: "Invalid simulation data" });
+      console.error("Simulation creation error:", error);
+      if (error.name === 'ZodError') {
+        console.error("Validation errors:", error.errors);
+        res.status(400).json({ message: "Invalid simulation data", errors: error.errors });
+      } else {
+        res.status(400).json({ message: "Invalid simulation data", error: error.message });
+      }
     }
   });
 

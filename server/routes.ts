@@ -9,6 +9,7 @@ import {
   type PhishingScenarioConfig 
 } from "./services/openai";
 import { emailService } from "./services/email";
+import puppeteer from "puppeteer";
 import { 
   insertSimulationSchema, 
   insertPhishingScenarioSchema,
@@ -378,34 +379,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const resourceType = req.params.type;
       
-      let content: string;
+      let htmlContent: string;
       let filename: string;
       
       switch (resourceType) {
         case 'email-security':
-          content = generateEmailSecurityGuide();
+          htmlContent = generateEmailSecurityGuide();
           filename = 'Email_Security_Guide.pdf';
           break;
         case 'incident-response':
-          content = generateIncidentResponsePlaybook();
+          htmlContent = generateIncidentResponsePlaybook();
           filename = 'Incident_Response_Playbook.pdf';
           break;
         case 'password-policy':
-          content = generatePasswordPolicyTemplate();
+          htmlContent = generatePasswordPolicyTemplate();
           filename = 'Password_Policy_Template.pdf';
           break;
         case 'social-engineering':
-          content = generateSocialEngineeringDefense();
+          htmlContent = generateSocialEngineeringDefense();
           filename = 'Social_Engineering_Defense.pdf';
           break;
         default:
           return res.status(404).json({ message: "Resource not found" });
       }
 
+      // Generate PDF from HTML using Puppeteer
+      const pdfBuffer = await generatePDFFromHTML(htmlContent);
+
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-      res.send(content);
+      res.send(pdfBuffer);
     } catch (error) {
+      console.error('PDF generation error:', error);
       res.status(500).json({ message: "Failed to generate training resource" });
     }
   });
@@ -1648,6 +1653,49 @@ function generateTrainingHTML(title: string, content: string): string {
     </div>
 </body>
 </html>`;
+}
+
+// Generate PDF from HTML using Puppeteer
+async function generatePDFFromHTML(htmlContent: string): Promise<Buffer> {
+  let browser;
+  try {
+    browser = await puppeteer.launch({
+      headless: true,
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-accelerated-2d-canvas',
+        '--no-first-run',
+        '--no-zygote',
+        '--single-process',
+        '--disable-gpu'
+      ]
+    });
+    
+    const page = await browser.newPage();
+    await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+    
+    const pdfBuffer = await page.pdf({
+      format: 'A4',
+      printBackground: true,
+      margin: {
+        top: '20mm',
+        right: '15mm',
+        bottom: '20mm',
+        left: '15mm'
+      }
+    });
+    
+    return pdfBuffer;
+  } catch (error) {
+    console.error('Puppeteer PDF generation error:', error);
+    throw new Error('Failed to generate PDF');
+  } finally {
+    if (browser) {
+      await browser.close();
+    }
+  }
 }
 
 

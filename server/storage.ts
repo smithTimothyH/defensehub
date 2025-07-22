@@ -146,6 +146,10 @@ export class DatabaseStorage implements IStorage {
     return log;
   }
 
+  async recordAuditLog(insertLog: InsertAuditLog): Promise<AuditLog> {
+    return this.createAuditLog(insertLog);
+  }
+
   async getAuditLogs(limit = 100): Promise<AuditLog[]> {
     return await db.select().from(auditLogs).orderBy(desc(auditLogs.timestamp)).limit(limit);
   }

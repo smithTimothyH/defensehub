@@ -8,6 +8,7 @@ import {
   generateCrisisScenario,
   type PhishingScenarioConfig 
 } from "./services/openai";
+import { emailService } from "./services/email";
 import { 
   insertSimulationSchema, 
   insertPhishingScenarioSchema,
@@ -216,6 +217,111 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(interactions);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch simulation interactions" });
+    }
+  });
+
+  // Email API Routes
+  
+  // Test email connection
+  app.get("/api/email/test", async (req, res) => {
+    try {
+      const result = await emailService.testConnection();
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to test email connection" });
+    }
+  });
+
+  // Send phishing simulation email
+  app.post("/api/email/phishing", async (req, res) => {
+    try {
+      const { to, scenario } = req.body;
+      
+      if (!to || !scenario) {
+        return res.status(400).json({ message: "Missing required fields: to, scenario" });
+      }
+
+      // Log the email attempt
+      await storage.recordAuditLog({
+        action: "send_phishing_email",
+        userId: req.body.userId || null,
+        resource: `email:${to}`,
+        details: { scenarioType: scenario.type }
+      });
+
+      const result = await emailService.sendPhishingSimulation(to, scenario);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to send phishing email" });
+    }
+  });
+
+  // Send compliance report
+  app.post("/api/email/compliance-report", async (req, res) => {
+    try {
+      const { to, reportData } = req.body;
+      
+      if (!to || !reportData) {
+        return res.status(400).json({ message: "Missing required fields: to, reportData" });
+      }
+
+      await storage.recordAuditLog({
+        action: "send_compliance_report",
+        userId: req.body.userId || null,
+        resource: `email:${Array.isArray(to) ? to.join(',') : to}`,
+        details: { reportType: "compliance" }
+      });
+
+      const result = await emailService.sendComplianceReport(to, reportData);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to send compliance report" });
+    }
+  });
+
+  // Send security alert
+  app.post("/api/email/security-alert", async (req, res) => {
+    try {
+      const { to, alertData } = req.body;
+      
+      if (!to || !alertData) {
+        return res.status(400).json({ message: "Missing required fields: to, alertData" });
+      }
+
+      await storage.recordAuditLog({
+        action: "send_security_alert",
+        userId: req.body.userId || null,
+        resource: `email:${Array.isArray(to) ? to.join(',') : to}`,
+        details: { alertTitle: alertData.title, severity: alertData.severity }
+      });
+
+      const result = await emailService.sendSecurityAlert(to, alertData);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to send security alert" });
+    }
+  });
+
+  // Send custom email
+  app.post("/api/email/send", async (req, res) => {
+    try {
+      const { to, subject, text, html } = req.body;
+      
+      if (!to || !subject || !text) {
+        return res.status(400).json({ message: "Missing required fields: to, subject, text" });
+      }
+
+      await storage.recordAuditLog({
+        action: "send_email",
+        userId: req.body.userId || null,
+        resource: `email:${Array.isArray(to) ? to.join(',') : to}`,
+        details: { subject }
+      });
+
+      const result = await emailService.sendEmail(to, subject, text, html);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to send email" });
     }
   });
 

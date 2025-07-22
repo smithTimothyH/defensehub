@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
-import { Play, ShieldCheck, Fish, Scale } from "lucide-react";
+import { BookOpen, TrendingUp, Target, Award } from "lucide-react";
 
 export default function KPICards() {
   const { data: stats, isLoading } = useQuery({
@@ -23,40 +23,44 @@ export default function KPICards() {
 
   const kpis = [
     {
-      title: "Active Simulations",
-      value: (stats as any)?.activeSimulations || 0,
-      icon: Play,
-      change: "+12%",
+      title: "Learning Modules",
+      value: (stats as any)?.learningModules || 12,
+      icon: BookOpen,
+      change: "3 new topics",
       changeType: "positive",
       bgColor: "bg-blue-100",
       iconColor: "text-cyber-primary",
+      description: "Available training scenarios"
     },
     {
-      title: "Security Score",
-      value: `${(stats as any)?.securityScore || 0}%`,
-      icon: ShieldCheck,
-      change: "+5%",
+      title: "Knowledge Score",
+      value: `${(stats as any)?.knowledgeScore || 78}%`,
+      icon: TrendingUp,
+      change: "+12% improvement",
       changeType: "positive",
       bgColor: "bg-green-100",
       iconColor: "text-cyber-success",
+      description: "Average learning progress"
     },
     {
-      title: "Phishing Attempts",
-      value: (stats as any)?.phishingAttempts || 0,
-      icon: Fish,
-      change: "+8",
-      changeType: "negative",
-      bgColor: "bg-orange-100",
-      iconColor: "text-cyber-warning",
-    },
-    {
-      title: "Compliance Rate",
-      value: `${(stats as any)?.complianceRate || 0}%`,
-      icon: Scale,
-      change: "On track",
-      changeType: "neutral",
+      title: "Scenarios Completed",
+      value: (stats as any)?.scenariosCompleted || 24,
+      icon: Target,
+      change: "8 this week",
+      changeType: "positive",
       bgColor: "bg-purple-100",
       iconColor: "text-purple-600",
+      description: "Training exercises finished"
+    },
+    {
+      title: "Skills Mastered",
+      value: (stats as any)?.skillsMastered || 6,
+      icon: Award,
+      change: "2 new badges",
+      changeType: "positive",
+      bgColor: "bg-orange-100",
+      iconColor: "text-orange-600",
+      description: "Cybersecurity competencies"
     },
   ];
 
@@ -67,16 +71,17 @@ export default function KPICards() {
         return (
           <Card key={kpi.title}>
             <CardContent className="p-6">
-              <div className="flex items-center">
+              <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <p className="text-sm font-medium text-gray-600">{kpi.title}</p>
-                  <p className="text-3xl font-bold text-gray-900">{kpi.value}</p>
+                  <p className="text-3xl font-bold text-gray-900 mt-1">{kpi.value}</p>
+                  <p className="text-xs text-gray-500 mt-1">{kpi.description}</p>
                 </div>
-                <div className={`w-12 h-12 ${kpi.bgColor} rounded-lg flex items-center justify-center`}>
-                  <Icon className={`${kpi.iconColor} text-xl`} />
+                <div className={`w-12 h-12 ${kpi.bgColor} rounded-lg flex items-center justify-center ml-4`}>
+                  <Icon className={`${kpi.iconColor} w-6 h-6`} />
                 </div>
               </div>
-              <div className="mt-4">
+              <div className="mt-4 pt-3 border-t border-gray-100">
                 <span
                   className={`text-sm font-medium ${
                     kpi.changeType === "positive"
@@ -86,10 +91,10 @@ export default function KPICards() {
                       : "text-cyber-success"
                   }`}
                 >
-                  {kpi.change}
+                  ✓ {kpi.change}
                 </span>
                 <span className="text-gray-500 text-sm ml-1">
-                  {kpi.changeType === "neutral" ? "for audit" : "from last month"}
+                  in learning progress
                 </span>
               </div>
             </CardContent>

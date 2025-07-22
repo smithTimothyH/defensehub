@@ -1,8 +1,8 @@
 import KPICards from "@/components/dashboard/kpi-cards";
 import RecentSimulations from "@/components/dashboard/recent-simulations";
 import QuickActions from "@/components/dashboard/quick-actions";
-import SecurityTrends from "@/components/dashboard/security-trends";
-import ComplianceStatus from "@/components/dashboard/compliance-status";
+import LearningProgress from "@/components/dashboard/security-trends";
+import SkillMastery from "@/components/dashboard/compliance-status";
 
 export default function Dashboard() {
   return (
@@ -15,8 +15,8 @@ export default function Dashboard() {
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <SecurityTrends />
-        <ComplianceStatus />
+        <LearningProgress />
+        <SkillMastery />
       </div>
     </div>
   );

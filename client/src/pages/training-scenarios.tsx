@@ -9,6 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { GraduationCap, BookOpen, Target, CheckCircle, Clock, AlertTriangle, Play, FileText, Users, Shield, Mail, Key, Download, Award, Star, TrendingUp, ChevronRight, ChevronLeft, Brain, Trophy, Crown, Flame, Zap, Medal } from "lucide-react";
 
 export default function TrainingScenarios() {
+  // Training scenarios with consistent "Start Training" buttons - force refresh
   const [selectedScenario, setSelectedScenario] = useState<any>(null);
   const [showTrainingDialog, setShowTrainingDialog] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
@@ -275,7 +276,7 @@ export default function TrainingScenarios() {
                 
                 <Button 
                   size="sm"
-                  className="bg-cyber-primary hover:bg-blue-700"
+                  className="bg-cyber-primary hover:bg-blue-700 text-white"
                   onClick={() => handleStartTraining(scenario)}
                 >
                   Start Training

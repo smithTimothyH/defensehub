@@ -135,6 +135,285 @@ export default function TrainingScenarios() {
     setShowResults(false);
   };
 
+  const getExerciseTitle = (moduleTitle: string, step: number) => {
+    const titles: Record<string, string[]> = {
+      "Email Security Fundamentals": [
+        "Phishing Email Recognition",
+        "Sender Verification",
+        "Safe Link Practices",
+        "Attachment Security",
+        "Email Headers Analysis",
+        "Reporting Procedures"
+      ],
+      "Social Engineering Awareness": [
+        "Phone Call Verification",
+        "Physical Access Control",
+        "Information Disclosure",
+        "Pretexting Scenarios",
+        "Authority Manipulation",
+        "Urgency Tactics",
+        "Baiting Attacks",
+        "Tailgating Prevention"
+      ],
+      "Incident Response Procedures": [
+        "Initial Detection",
+        "Incident Classification",
+        "Communication Protocols",
+        "Evidence Preservation",
+        "Containment Strategies",
+        "Recovery Planning",
+        "Documentation Requirements",
+        "Lessons Learned",
+        "Stakeholder Notifications",
+        "Legal Considerations"
+      ],
+      "Password Security Best Practices": [
+        "Password Strength",
+        "Multi-Factor Authentication",
+        "Password Manager Usage",
+        "Account Recovery",
+        "Shared Account Security"
+      ]
+    };
+    return titles[moduleTitle]?.[step] || `Step ${step + 1}: Security Challenge`;
+  };
+
+  const getExerciseQuestion = (moduleTitle: string, step: number) => {
+    const questions: Record<string, string[]> = {
+      "Email Security Fundamentals": [
+        "You receive an urgent email from 'CEO@yourcompany.co' asking for sensitive financial data. The real company domain is 'yourcompany.com'. What's your first action?",
+        "An email claims to be from your bank asking you to verify account details. How do you verify if it's legitimate?",
+        "You get an email with a shortened URL (bit.ly link) claiming to be an important security update. What should you do?",
+        "An email attachment named 'Invoice.pdf.exe' arrives from an unknown sender. How should you handle this?",
+        "You notice an email has suspicious headers showing it originated from a different domain than claimed. What's your next step?",
+        "After identifying a phishing email, what's the proper way to report it to your security team?"
+      ],
+      "Social Engineering Awareness": [
+        "Someone calls claiming to be from IT support, asking for your password to 'fix your account'. How do you respond?",
+        "A person in a delivery uniform asks you to hold the door open to the secure office area. What should you do?",
+        "During casual conversation, a stranger asks about your company's software systems. How do you handle this?",
+        "You receive a call from someone claiming to be conducting a security audit, requesting employee information. What's your response?",
+        "Someone wearing a company badge you don't recognize asks you to help them access a restricted area. What do you do?",
+        "You get a call saying there's an urgent security issue and you must act immediately or lose access. How do you respond?",
+        "A USB drive labeled 'Executive Bonus Information' is left in the parking lot. What should you do?",
+        "Someone follows closely behind you into a secure building without badging in. What's your appropriate action?"
+      ],
+      "Incident Response Procedures": [
+        "You discover malware on your computer. What's the immediate first step you should take?",
+        "How do you determine if a security event qualifies as a major incident requiring escalation?",
+        "Who should be notified first when you discover a potential data breach?",
+        "What information should you preserve when you suspect a security incident?",
+        "How do you safely contain a suspected malware infection without destroying evidence?",
+        "What's the priority order for restoring systems after a security incident?",
+        "What details must be documented during an incident response?",
+        "How do you conduct a proper post-incident review?",
+        "When should external parties (customers, partners) be notified of an incident?",
+        "What legal requirements must be considered during incident response?"
+      ],
+      "Password Security Best Practices": [
+        "What makes a password strong and secure against common attacks?",
+        "When should you enable multi-factor authentication on your accounts?",
+        "How should you safely store and manage multiple complex passwords?",
+        "What steps should you take if you forget your password and need to recover access?",
+        "How do you properly secure shared accounts used by multiple team members?"
+      ]
+    };
+    return questions[moduleTitle]?.[step] || "What is the best security practice in this situation?";
+  };
+
+  const getExerciseOptions = (moduleTitle: string, step: number) => {
+    const options: Record<string, Array<Array<{value: string, label: string}>>> = {
+      "Email Security Fundamentals": [
+        [
+          { value: "reply", label: "Reply immediately with the requested information" },
+          { value: "verify", label: "Contact the CEO through known channels to verify the request" },
+          { value: "ignore", label: "Delete the email without taking action" },
+          { value: "forward", label: "Forward to IT security for investigation" }
+        ],
+        [
+          { value: "click", label: "Click the link in the email to verify" },
+          { value: "call", label: "Call the bank using the number on your official bank card" },
+          { value: "search", label: "Search online for the bank's contact information" },
+          { value: "wait", label: "Wait for another email to confirm it's real" }
+        ],
+        [
+          { value: "click", label: "Click the shortened URL to see where it leads" },
+          { value: "expand", label: "Use a URL expander tool to check the destination first" },
+          { value: "ignore", label: "Delete the email immediately" },
+          { value: "ask", label: "Ask IT if they sent this update" }
+        ],
+        [
+          { value: "open", label: "Open the attachment to see what it contains" },
+          { value: "scan", label: "Scan with antivirus before opening" },
+          { value: "delete", label: "Delete the email and attachment immediately" },
+          { value: "report", label: "Report to IT security without opening" }
+        ],
+        [
+          { value: "ignore", label: "Ignore the headers and focus on the content" },
+          { value: "report", label: "Report as suspicious to the security team" },
+          { value: "reply", label: "Reply asking for clarification" },
+          { value: "research", label: "Research the sending domain online" }
+        ],
+        [
+          { value: "delete", label: "Just delete it and move on" },
+          { value: "forward", label: "Forward to IT security with full headers" },
+          { value: "warn", label: "Warning colleagues via company chat" },
+          { value: "screenshot", label: "Take a screenshot and email it to security" }
+        ]
+      ],
+      "Social Engineering Awareness": [
+        [
+          { value: "provide", label: "Provide your password since they're from IT" },
+          { value: "verify", label: "Ask for their employee ID and verify through proper channels" },
+          { value: "refuse", label: "Refuse and hang up immediately" },
+          { value: "supervisor", label: "Ask to speak with their supervisor first" }
+        ],
+        [
+          { value: "help", label: "Hold the door open to be helpful" },
+          { value: "ask", label: "Ask to see their ID badge and verify their identity" },
+          { value: "refuse", label: "Politely refuse and direct them to the main entrance" },
+          { value: "escort", label: "Escort them to the reception desk" }
+        ],
+        [
+          { value: "share", label: "Share general information since it seems harmless" },
+          { value: "deflect", label: "Politely deflect and change the subject" },
+          { value: "report", label: "Report the conversation to security" },
+          { value: "lie", label: "Provide false information to mislead them" }
+        ],
+        [
+          { value: "comply", label: "Provide the requested information to help the audit" },
+          { value: "verify", label: "Verify their identity through official channels first" },
+          { value: "refuse", label: "Refuse to provide any information" },
+          { value: "redirect", label: "Redirect them to your supervisor" }
+        ],
+        [
+          { value: "help", label: "Help them access the area since they have a badge" },
+          { value: "verify", label: "Verify their identity and need for access first" },
+          { value: "refuse", label: "Politely refuse and suggest they get proper authorization" },
+          { value: "escort", label: "Escort them to security to verify their access" }
+        ],
+        [
+          { value: "act", label: "Act immediately to prevent losing access" },
+          { value: "verify", label: "Verify the urgency through official channels" },
+          { value: "ignore", label: "Ignore the call completely" },
+          { value: "callback", label: "Ask for a callback number and verify independently" }
+        ],
+        [
+          { value: "use", label: "Use the USB drive to see what's on it" },
+          { value: "turn", label: "Turn it in to security without using it" },
+          { value: "ignore", label: "Leave it where you found it" },
+          { value: "destroy", label: "Physically destroy the USB drive" }
+        ],
+        [
+          { value: "ignore", label: "Ignore it since they're already inside" },
+          { value: "challenge", label: "Politely challenge them to show their badge" },
+          { value: "report", label: "Report the incident to security" },
+          { value: "follow", label: "Follow them to see where they go" }
+        ]
+      ],
+      "Incident Response Procedures": [
+        [
+          { value: "scan", label: "Run a full antivirus scan immediately" },
+          { value: "disconnect", label: "Disconnect from the network and report to IT" },
+          { value: "shutdown", label: "Shut down the computer completely" },
+          { value: "continue", label: "Continue working while monitoring the situation" }
+        ],
+        [
+          { value: "impact", label: "Based on potential business impact and data sensitivity" },
+          { value: "time", label: "Based on how long the incident has been occurring" },
+          { value: "systems", label: "Based on the number of systems affected" },
+          { value: "users", label: "Based on the number of users complaining" }
+        ],
+        [
+          { value: "manager", label: "Your direct manager first" },
+          { value: "security", label: "The incident response team or security operations" },
+          { value: "it", label: "The general IT help desk" },
+          { value: "legal", label: "The legal department immediately" }
+        ],
+        [
+          { value: "logs", label: "System logs and network traffic data" },
+          { value: "screenshots", label: "Screenshots of error messages only" },
+          { value: "emails", label: "Related email communications" },
+          { value: "all", label: "All of the above and more" }
+        ],
+        [
+          { value: "power", label: "Immediately power off all affected systems" },
+          { value: "isolate", label: "Isolate affected systems from the network" },
+          { value: "patch", label: "Apply security patches immediately" },
+          { value: "backup", label: "Restore from the most recent backup" }
+        ],
+        [
+          { value: "critical", label: "Critical business systems first" },
+          { value: "clean", label: "Clean systems first, then infected ones" },
+          { value: "user", label: "User workstations before servers" },
+          { value: "network", label: "Network infrastructure first" }
+        ],
+        [
+          { value: "basic", label: "Basic timeline and systems affected" },
+          { value: "detailed", label: "Detailed timeline, actions taken, and evidence collected" },
+          { value: "summary", label: "Brief summary for management" },
+          { value: "technical", label: "Technical details only" }
+        ],
+        [
+          { value: "immediately", label: "Immediately after containment" },
+          { value: "weekly", label: "One week after resolution" },
+          { value: "monthly", label: "One month after resolution" },
+          { value: "never", label: "Reviews are not necessary" }
+        ],
+        [
+          { value: "immediately", label: "Immediately upon discovery" },
+          { value: "contained", label: "After the incident is contained" },
+          { value: "resolved", label: "After the incident is fully resolved" },
+          { value: "never", label: "Only if specifically required by contract" }
+        ],
+        [
+          { value: "none", label: "No legal requirements for most incidents" },
+          { value: "notification", label: "Data breach notification laws and regulations" },
+          { value: "preservation", label: "Evidence preservation for potential litigation" },
+          { value: "both", label: "Both notification requirements and evidence preservation" }
+        ]
+      ],
+      "Password Security Best Practices": [
+        [
+          { value: "length", label: "Long passwords with a mix of characters, numbers, and symbols" },
+          { value: "personal", label: "Personal information like birthdays and names" },
+          { value: "common", label: "Common words from the dictionary" },
+          { value: "simple", label: "Simple patterns like '123456' or 'password'" }
+        ],
+        [
+          { value: "always", label: "On all accounts, especially those with sensitive data" },
+          { value: "work", label: "Only on work-related accounts" },
+          { value: "optional", label: "Only when the service requires it" },
+          { value: "never", label: "It's too inconvenient to use regularly" }
+        ],
+        [
+          { value: "memory", label: "Memorize all passwords and don't write them down" },
+          { value: "manager", label: "Use a reputable password manager application" },
+          { value: "document", label: "Keep them in a document on your computer" },
+          { value: "reuse", label: "Use the same strong password for all accounts" }
+        ],
+        [
+          { value: "guess", label: "Try to guess the password using personal information" },
+          { value: "official", label: "Use the official account recovery process" },
+          { value: "support", label: "Call tech support and ask them to reset it" },
+          { value: "new", label: "Create a new account instead" }
+        ],
+        [
+          { value: "single", label: "Use a single strong password that everyone knows" },
+          { value: "individual", label: "Create individual accounts for each user" },
+          { value: "rotate", label: "Regularly rotate the shared password" },
+          { value: "post", label: "Post the password in a secure location" }
+        ]
+      ]
+    };
+    return options[moduleTitle]?.[step] || [
+      { value: "a", label: "Option A" },
+      { value: "b", label: "Option B" },
+      { value: "c", label: "Option C" },
+      { value: "d", label: "Option D" }
+    ];
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -418,33 +697,25 @@ export default function TrainingScenarios() {
             <Card>
               <CardContent className="p-6">
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">
-                    Scenario {exerciseStep + 1}: Email Security Challenge
-                  </h3>
-                  <p className="text-gray-600">
-                    You receive an email claiming to be from your IT department asking you to verify your password. 
-                    The sender address is "it-support@{currentExercise?.title.includes('Email') ? 'yourcompany.com' : 'security-team.org'}". 
-                    What should be your first action?
-                  </p>
-                  
-                  <RadioGroup value={selectedAnswer} onValueChange={setSelectedAnswer}>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="verify" id="verify" />
-                      <Label htmlFor="verify">Click the link and verify your password immediately</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="check" id="check" />
-                      <Label htmlFor="check">Check the sender's email address and contact IT through official channels</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="ignore" id="ignore" />
-                      <Label htmlFor="ignore">Delete the email without taking any action</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="forward" id="forward" />
-                      <Label htmlFor="forward">Forward the email to colleagues to warn them</Label>
-                    </div>
-                  </RadioGroup>
+                  {currentExercise && (
+                    <>
+                      <h3 className="text-lg font-semibold">
+                        {getExerciseTitle(currentExercise.title, exerciseStep)}
+                      </h3>
+                      <p className="text-gray-600">
+                        {getExerciseQuestion(currentExercise.title, exerciseStep)}
+                      </p>
+                      
+                      <RadioGroup value={selectedAnswer} onValueChange={setSelectedAnswer}>
+                        {getExerciseOptions(currentExercise.title, exerciseStep).map((option: {value: string, label: string}, index: number) => (
+                          <div key={index} className="flex items-center space-x-2">
+                            <RadioGroupItem value={option.value} id={option.value} />
+                            <Label htmlFor={option.value}>{option.label}</Label>
+                          </div>
+                        ))}
+                      </RadioGroup>
+                    </>
+                  )}
                 </div>
               </CardContent>
             </Card>

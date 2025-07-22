@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import { GraduationCap, BookOpen, Target, CheckCircle, Clock, AlertTriangle, Play, FileText, Users, Shield, Mail, Key, Download, Award, Star, TrendingUp, ChevronRight, ChevronLeft, Brain, Trophy } from "lucide-react";
+import { GraduationCap, BookOpen, Target, CheckCircle, Clock, AlertTriangle, Play, FileText, Users, Shield, Mail, Key, Download, Award, Star, TrendingUp, ChevronRight, ChevronLeft, Brain, Trophy, Crown, Flame, Zap, Medal } from "lucide-react";
 
 export default function TrainingScenarios() {
   const [selectedScenario, setSelectedScenario] = useState<any>(null);
@@ -18,6 +18,33 @@ export default function TrainingScenarios() {
   const [selectedAnswer, setSelectedAnswer] = useState("");
   const [exerciseScore, setExerciseScore] = useState(0);
   const [showResults, setShowResults] = useState(false);
+  const [showAchievements, setShowAchievements] = useState(false);
+  const [userLevel, setUserLevel] = useState(12);
+  const [experiencePoints, setExperiencePoints] = useState(2850);
+  const [learningStreak, setLearningStreak] = useState(7);
+
+  // Gamification data
+  const achievements = [
+    { id: 1, title: "First Steps", description: "Complete your first training module", icon: Star, unlocked: true, rarity: "common" },
+    { id: 2, title: "Phishing Expert", description: "Identify 10 phishing emails correctly", icon: Shield, unlocked: true, rarity: "rare" },
+    { id: 3, title: "Security Guardian", description: "Complete 5 security scenarios", icon: Crown, unlocked: false, rarity: "epic" },
+    { id: 4, title: "Streak Master", description: "Maintain a 7-day learning streak", icon: Flame, unlocked: true, rarity: "rare" },
+    { id: 5, title: "Knowledge Seeker", description: "Read all training materials", icon: BookOpen, unlocked: false, rarity: "common" },
+    { id: 6, title: "Champion", description: "Reach level 15", icon: Trophy, unlocked: false, rarity: "legendary" }
+  ];
+
+  const levelProgress = ((experiencePoints % 250) / 250) * 100;
+  const nextLevelXP = (userLevel + 1) * 250;
+
+  const getRarityColor = (rarity: string) => {
+    switch (rarity) {
+      case "common": return "text-gray-600 border-gray-300 bg-gray-50";
+      case "rare": return "text-blue-600 border-blue-300 bg-blue-50";
+      case "epic": return "text-purple-600 border-purple-300 bg-purple-50";
+      case "legendary": return "text-orange-600 border-orange-300 bg-orange-50";
+      default: return "text-gray-600 border-gray-300 bg-gray-50";
+    }
+  };
 
   const scenarios = [
     {
@@ -529,13 +556,65 @@ export default function TrainingScenarios() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Training Scenarios</h2>
-          <p className="text-gray-600">Interactive cybersecurity training modules and scenarios</p>
+          <p className="text-gray-600">Gamified cybersecurity training with achievements and progression</p>
         </div>
-        <Button className="bg-cyber-primary hover:bg-blue-700">
-          <GraduationCap className="h-4 w-4 mr-2" />
-          Create Custom Scenario
-        </Button>
+        <div className="flex items-center space-x-3">
+          <Button 
+            onClick={() => setShowAchievements(true)}
+            variant="outline"
+            className="border-yellow-300 text-yellow-600 hover:bg-yellow-50"
+          >
+            <Trophy className="h-4 w-4 mr-2" />
+            Achievements
+          </Button>
+          <Button className="bg-cyber-primary hover:bg-blue-700">
+            <GraduationCap className="h-4 w-4 mr-2" />
+            Create Custom Scenario
+          </Button>
+        </div>
       </div>
+
+      {/* Gamification Progress Panel */}
+      <Card className="bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200">
+        <CardContent className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Crown className="h-5 w-5 text-purple-600" />
+                <span className="font-medium text-purple-900">Level {userLevel}</span>
+              </div>
+              <Progress value={levelProgress} className="h-2" />
+              <p className="text-xs text-purple-700">{experiencePoints} / {nextLevelXP} XP</p>
+            </div>
+            
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Flame className="h-5 w-5 text-orange-600" />
+                <span className="font-medium text-orange-900">{learningStreak} Day Streak</span>
+              </div>
+              <div className="text-sm text-orange-700">Keep learning daily!</div>
+            </div>
+            
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Trophy className="h-5 w-5 text-yellow-600" />
+                <span className="font-medium text-yellow-900">
+                  {achievements.filter(a => a.unlocked).length} / {achievements.length} Achievements
+                </span>
+              </div>
+              <div className="text-sm text-yellow-700">Unlock more by completing training</div>
+            </div>
+            
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <TrendingUp className="h-5 w-5 text-green-600" />
+                <span className="font-medium text-green-900">89% Success Rate</span>
+              </div>
+              <div className="text-sm text-green-700">Keep up the excellent work!</div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Progress Overview */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -1059,6 +1138,130 @@ export default function TrainingScenarios() {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Achievements Dialog */}
+      <Dialog open={showAchievements} onOpenChange={setShowAchievements}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center">
+              <Trophy className="h-5 w-5 mr-2 text-yellow-600" />
+              Achievements & Progress
+            </DialogTitle>
+            <DialogDescription>
+              Track your cybersecurity learning journey and unlock rewards
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-6">
+            {/* Progress Summary */}
+            <Card className="bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-200">
+              <CardContent className="p-4">
+                <div className="grid grid-cols-3 gap-4 text-center">
+                  <div>
+                    <div className="flex items-center justify-center space-x-1 mb-1">
+                      <Crown className="h-4 w-4 text-purple-600" />
+                      <span className="font-bold text-purple-600">Level {userLevel}</span>
+                    </div>
+                    <p className="text-xs text-gray-600">Security Expert</p>
+                  </div>
+                  <div>
+                    <div className="flex items-center justify-center space-x-1 mb-1">
+                      <Zap className="h-4 w-4 text-yellow-600" />
+                      <span className="font-bold text-yellow-600">{experiencePoints} XP</span>
+                    </div>
+                    <p className="text-xs text-gray-600">Total Experience</p>
+                  </div>
+                  <div>
+                    <div className="flex items-center justify-center space-x-1 mb-1">
+                      <Medal className="h-4 w-4 text-green-600" />
+                      <span className="font-bold text-green-600">{achievements.filter(a => a.unlocked).length}</span>
+                    </div>
+                    <p className="text-xs text-gray-600">Achievements</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Achievement Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {achievements.map((achievement) => {
+                const Icon = achievement.icon;
+                return (
+                  <Card 
+                    key={achievement.id} 
+                    className={`transition-all duration-200 ${
+                      achievement.unlocked 
+                        ? getRarityColor(achievement.rarity) 
+                        : 'bg-gray-50 border-gray-200 opacity-60'
+                    }`}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-start space-x-3">
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                          achievement.unlocked ? 'bg-white' : 'bg-gray-200'
+                        }`}>
+                          <Icon className={`h-5 w-5 ${
+                            achievement.unlocked ? 'text-gray-700' : 'text-gray-400'
+                          }`} />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-2">
+                            <h4 className={`font-medium ${
+                              achievement.unlocked ? 'text-gray-900' : 'text-gray-500'
+                            }`}>
+                              {achievement.title}
+                            </h4>
+                            <Badge 
+                              variant="outline" 
+                              className={`text-xs ${getRarityColor(achievement.rarity)}`}
+                            >
+                              {achievement.rarity}
+                            </Badge>
+                          </div>
+                          <p className={`text-sm mt-1 ${
+                            achievement.unlocked ? 'text-gray-600' : 'text-gray-400'
+                          }`}>
+                            {achievement.description}
+                          </p>
+                          {achievement.unlocked && (
+                            <Badge className="mt-2 bg-green-100 text-green-700 border-green-300">
+                              <CheckCircle className="h-3 w-3 mr-1" />
+                              Unlocked
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+
+            {/* Next Achievement Preview */}
+            <Card className="bg-blue-50 border-blue-200">
+              <CardContent className="p-4">
+                <h4 className="font-medium text-blue-900 mb-2">🎯 Next Achievement</h4>
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <Crown className="h-4 w-4 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-blue-900">Security Guardian</p>
+                    <p className="text-sm text-blue-700">Complete 5 security scenarios (3/5 completed)</p>
+                  </div>
+                </div>
+                <Progress value={60} className="mt-3 h-2" />
+              </CardContent>
+            </Card>
+
+            <div className="flex justify-end">
+              <Button variant="outline" onClick={() => setShowAchievements(false)}>
+                Close
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

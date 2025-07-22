@@ -1,0 +1,124 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(20, 14.3%, 4.1%);
+  --muted: hsl(60, 4.8%, 95.9%);
+  --muted-foreground: hsl(25, 5.3%, 44.7%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(20, 14.3%, 4.1%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(20, 14.3%, 4.1%);
+  --border: hsl(20, 5.9%, 90%);
+  --input: hsl(20, 5.9%, 90%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(60, 4.8%, 95.9%);
+  --secondary-foreground: hsl(24, 9.8%, 10%);
+  --accent: hsl(60, 4.8%, 95.9%);
+  --accent-foreground: hsl(24, 9.8%, 10%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(60, 9.1%, 97.8%);
+  --ring: hsl(20, 14.3%, 4.1%);
+  --radius: 0.5rem;
+  
+  /* Custom cybersecurity theme colors */
+  --cyber-primary: hsl(207, 90%, 54%);
+  --cyber-secondary: hsl(210, 11%, 15%);
+  --cyber-accent: hsl(14, 100%, 57%);
+  --cyber-success: hsl(142, 71%, 45%);
+  --cyber-warning: hsl(38, 92%, 50%);
+  --cyber-error: hsl(4, 90%, 58%);
+  --cyber-blue-50: hsl(214, 100%, 97%);
+  --cyber-green-50: hsl(138, 76%, 97%);
+  --cyber-orange-50: hsl(33, 100%, 96%);
+  --cyber-red-50: hsl(0, 86%, 97%);
+  --cyber-purple-50: hsl(270, 100%, 98%);
+  --cyber-purple-600: hsl(261, 73%, 50%);
+}
+
+.dark {
+  --background: hsl(240, 10%, 3.9%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(240, 3.7%, 15.9%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --popover: hsl(240, 10%, 3.9%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 10%, 3.9%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 3.7%, 15.9%);
+  --input: hsl(240, 3.7%, 15.9%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(240, 3.7%, 15.9%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(240, 3.7%, 15.9%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(240, 4.9%, 83.9%);
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+}
+
+@layer utilities {
+  .cyber-primary {
+    color: var(--cyber-primary);
+  }
+  
+  .bg-cyber-primary {
+    background-color: var(--cyber-primary);
+  }
+  
+  .cyber-secondary {
+    color: var(--cyber-secondary);
+  }
+  
+  .bg-cyber-secondary {
+    background-color: var(--cyber-secondary);
+  }
+  
+  .cyber-accent {
+    color: var(--cyber-accent);
+  }
+  
+  .bg-cyber-accent {
+    background-color: var(--cyber-accent);
+  }
+  
+  .cyber-success {
+    color: var(--cyber-success);
+  }
+  
+  .bg-cyber-success {
+    background-color: var(--cyber-success);
+  }
+  
+  .cyber-warning {
+    color: var(--cyber-warning);
+  }
+  
+  .bg-cyber-warning {
+    background-color: var(--cyber-warning);
+  }
+  
+  .cyber-error {
+    color: var(--cyber-error);
+  }
+  
+  .bg-cyber-error {
+    background-color: var(--cyber-error);
+  }
+}

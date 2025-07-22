@@ -125,6 +125,16 @@ export default function TrainingScenarios() {
     setShowTrainingDialog(true);
   };
 
+  const handleBeginTraining = () => {
+    setShowTrainingDialog(false);
+    setShowExerciseModal(true);
+    setCurrentExercise(selectedScenario);
+    setExerciseStep(0);
+    setSelectedAnswer("");
+    setExerciseScore(0);
+    setShowResults(false);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -369,11 +379,146 @@ export default function TrainingScenarios() {
               <Button variant="outline" onClick={() => setShowTrainingDialog(false)}>
                 Close
               </Button>
-              <Button className="bg-cyber-primary hover:bg-blue-700">
+              <Button 
+                className="bg-cyber-primary hover:bg-blue-700"
+                onClick={handleBeginTraining}
+              >
                 <Play className="h-4 w-4 mr-2" />
                 Begin Training
               </Button>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Exercise Modal */}
+      <Dialog open={showExerciseModal} onOpenChange={setShowExerciseModal}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center space-x-2">
+              <Target className="h-5 w-5 text-cyber-primary" />
+              <span>Interactive Training Exercise</span>
+            </DialogTitle>
+            <DialogDescription>
+              Complete the training exercises to master {currentExercise?.title.toLowerCase()}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-6">
+            {/* Progress Bar */}
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span>Progress</span>
+                <span>{exerciseStep + 1} of {currentExercise?.steps || 5}</span>
+              </div>
+              <Progress value={((exerciseStep + 1) / (currentExercise?.steps || 5)) * 100} className="h-2" />
+            </div>
+
+            {/* Exercise Content */}
+            <Card>
+              <CardContent className="p-6">
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">
+                    Scenario {exerciseStep + 1}: Email Security Challenge
+                  </h3>
+                  <p className="text-gray-600">
+                    You receive an email claiming to be from your IT department asking you to verify your password. 
+                    The sender address is "it-support@{currentExercise?.title.includes('Email') ? 'yourcompany.com' : 'security-team.org'}". 
+                    What should be your first action?
+                  </p>
+                  
+                  <RadioGroup value={selectedAnswer} onValueChange={setSelectedAnswer}>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="verify" id="verify" />
+                      <Label htmlFor="verify">Click the link and verify your password immediately</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="check" id="check" />
+                      <Label htmlFor="check">Check the sender's email address and contact IT through official channels</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="ignore" id="ignore" />
+                      <Label htmlFor="ignore">Delete the email without taking any action</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="forward" id="forward" />
+                      <Label htmlFor="forward">Forward the email to colleagues to warn them</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Navigation */}
+            <div className="flex justify-between">
+              <Button 
+                variant="outline" 
+                onClick={() => setExerciseStep(Math.max(0, exerciseStep - 1))}
+                disabled={exerciseStep === 0}
+              >
+                <ChevronLeft className="h-4 w-4 mr-2" />
+                Previous
+              </Button>
+              
+              <div className="flex space-x-3">
+                <Button variant="outline" onClick={() => setShowExerciseModal(false)}>
+                  Close
+                </Button>
+                <Button 
+                  onClick={() => {
+                    if (exerciseStep < (currentExercise?.steps || 5) - 1) {
+                      setExerciseStep(exerciseStep + 1);
+                      setSelectedAnswer("");
+                    } else {
+                      setShowResults(true);
+                      setExerciseScore(85); // Simulated score
+                    }
+                  }}
+                  disabled={!selectedAnswer}
+                  className="bg-cyber-primary hover:bg-blue-700"
+                >
+                  {exerciseStep < (currentExercise?.steps || 5) - 1 ? (
+                    <>Next <ChevronRight className="h-4 w-4 ml-2" /></>
+                  ) : (
+                    <>Complete <CheckCircle className="h-4 w-4 ml-2" /></>
+                  )}
+                </Button>
+              </div>
+            </div>
+
+            {/* Results */}
+            {showResults && (
+              <Card className="bg-green-50 border-green-200">
+                <CardContent className="p-6">
+                  <div className="text-center space-y-4">
+                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+                      <Trophy className="h-8 w-8 text-green-600" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-green-900">Training Complete!</h3>
+                    <p className="text-green-700">You scored {exerciseScore}% on this training module</p>
+                    <div className="flex items-center justify-center space-x-4 text-sm">
+                      <div className="flex items-center space-x-1">
+                        <Star className="h-4 w-4 text-yellow-600" />
+                        <span>+125 XP</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <Medal className="h-4 w-4 text-purple-600" />
+                        <span>Achievement Unlocked</span>
+                      </div>
+                    </div>
+                    <Button 
+                      onClick={() => {
+                        setShowExerciseModal(false);
+                        setShowResults(false);
+                      }}
+                      className="bg-cyber-primary hover:bg-blue-700"
+                    >
+                      Continue Learning
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </DialogContent>
       </Dialog>

@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Fish, Zap, Play, AlertTriangle, Eye, Users, Calendar, Target } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Fish, Zap, Play, AlertTriangle, Eye, Users, Calendar, Target, Brain, MessageSquare, Star, TrendingUp, CheckCircle, Trophy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -18,10 +20,41 @@ export default function PhishingSimulator() {
   const [selectedCampaign, setSelectedCampaign] = useState<any>(null);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const [showLaunchDialog, setShowLaunchDialog] = useState(false);
+  const [showCoachDialog, setShowCoachDialog] = useState(false);
   const [campaignName, setCampaignName] = useState("");
   const [campaignEmails, setCampaignEmails] = useState("");
+  const [userSkillLevel, setUserSkillLevel] = useState(75);
+  const [adaptiveSuggestions, setAdaptiveSuggestions] = useState<string[]>([]);
+  const [coachingMessage, setCoachingMessage] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // AI coaching suggestions based on performance
+  const coachingSuggestions = [
+    "Focus on sender verification - check email addresses carefully",
+    "Look for urgency tactics that pressure quick decisions",
+    "Verify requests through alternative communication channels",
+    "Be suspicious of unexpected attachments or links",
+    "Pay attention to grammar and spelling inconsistencies"
+  ];
+
+  // Simulate adaptive AI coaching based on user performance
+  useEffect(() => {
+    const generateAdaptiveCoaching = () => {
+      const suggestions = coachingSuggestions.filter(() => Math.random() > 0.5);
+      setAdaptiveSuggestions(suggestions.slice(0, 3));
+      
+      if (userSkillLevel < 70) {
+        setCoachingMessage("Your security awareness could use improvement. Let's focus on the fundamentals of phishing detection.");
+      } else if (userSkillLevel < 85) {
+        setCoachingMessage("Good progress! You're developing solid security instincts. Let's work on advanced techniques.");
+      } else {
+        setCoachingMessage("Excellent security awareness! You're ready for advanced scenarios and peer mentoring.");
+      }
+    };
+
+    generateAdaptiveCoaching();
+  }, [userSkillLevel]);
 
   const { data: simulations, isLoading } = useQuery({
     queryKey: ["/api/simulations"],
@@ -149,11 +182,21 @@ export default function PhishingSimulator() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Phishing Simulator</h2>
-          <p className="text-gray-600">Create and manage AI-powered phishing campaigns for security awareness training</p>
+          <p className="text-gray-600">AI-powered phishing campaigns with adaptive coaching</p>
         </div>
-        <div className="flex items-center space-x-2">
-          <Fish className="h-6 w-6 text-cyber-primary" />
-          <Zap className="h-5 w-5 text-cyber-warning" />
+        <div className="flex items-center space-x-3">
+          <Button 
+            onClick={() => setShowCoachDialog(true)}
+            variant="outline"
+            className="border-purple-300 text-purple-600 hover:bg-purple-50"
+          >
+            <Brain className="h-4 w-4 mr-2" />
+            AI Coach
+          </Button>
+          <div className="flex items-center space-x-2">
+            <Fish className="h-6 w-6 text-cyber-primary" />
+            <Zap className="h-5 w-5 text-cyber-warning" />
+          </div>
         </div>
       </div>
 
@@ -465,6 +508,100 @@ export default function PhishingSimulator() {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* AI Coaching Dialog */}
+      <Dialog open={showCoachDialog} onOpenChange={setShowCoachDialog}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center">
+              <Brain className="h-5 w-5 mr-2 text-purple-600" />
+              AI Security Coach
+            </DialogTitle>
+            <DialogDescription>
+              Personalized coaching based on your phishing detection performance
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-6">
+            {/* Skill Level Progress */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h4 className="font-medium">Security Awareness Level</h4>
+                <Badge variant="outline" className="text-purple-600 border-purple-300">
+                  {userSkillLevel >= 85 ? 'Expert' : userSkillLevel >= 70 ? 'Advanced' : 'Intermediate'}
+                </Badge>
+              </div>
+              <Progress value={userSkillLevel} className="h-3" />
+              <p className="text-sm text-gray-600">{userSkillLevel}% - {coachingMessage}</p>
+            </div>
+
+            {/* Adaptive Suggestions */}
+            <div className="space-y-3">
+              <h4 className="font-medium flex items-center">
+                <Star className="h-4 w-4 mr-2 text-yellow-500" />
+                Personalized Training Focus
+              </h4>
+              <div className="space-y-2">
+                {adaptiveSuggestions.map((suggestion, index) => (
+                  <Alert key={index} className="bg-blue-50 border-blue-200">
+                    <CheckCircle className="h-4 w-4 text-blue-600" />
+                    <AlertDescription className="text-blue-900">
+                      {suggestion}
+                    </AlertDescription>
+                  </Alert>
+                ))}
+              </div>
+            </div>
+
+            {/* Performance Insights */}
+            <div className="grid grid-cols-2 gap-4">
+              <Card className="bg-green-50 border-green-200">
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-2">
+                    <Trophy className="h-5 w-5 text-green-600" />
+                    <div>
+                      <p className="text-sm font-medium text-green-900">Strengths</p>
+                      <p className="text-xs text-green-700">Email verification</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-orange-50 border-orange-200">
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-2">
+                    <TrendingUp className="h-5 w-5 text-orange-600" />
+                    <div>
+                      <p className="text-sm font-medium text-orange-900">Focus Area</p>
+                      <p className="text-xs text-orange-700">Link analysis</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="flex justify-between">
+              <Button variant="outline" onClick={() => setShowCoachDialog(false)}>
+                Close
+              </Button>
+              <Button 
+                className="bg-purple-600 hover:bg-purple-700"
+                onClick={() => {
+                  setUserSkillLevel(prev => Math.min(100, prev + 5));
+                  toast({
+                    title: "Practice Session Started",
+                    description: "AI coach will provide real-time feedback during training.",
+                  });
+                  setShowCoachDialog(false);
+                }}
+              >
+                <MessageSquare className="h-4 w-4 mr-2" />
+                Start Guided Practice
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

@@ -417,6 +417,113 @@ export default function TrainingScenarios() {
     }
   };
 
+  const renderTrainingContent = () => {
+    if (!selectedScenario) return null;
+    
+    switch (currentStep) {
+      case 0:
+        return (
+          <div className="space-y-4">
+            <p className="text-gray-600">{selectedScenario.content.overview}</p>
+            <div>
+              <h4 className="font-medium mb-2">Learning Objectives:</h4>
+              <ul className="list-disc list-inside space-y-1">
+                {selectedScenario.content.objectives.map((objective: string, index: number) => (
+                  <li key={index} className="text-sm text-gray-600">{objective}</li>
+                ))}
+              </ul>
+            </div>
+            <div className="flex justify-between">
+              <Button variant="outline" disabled>
+                <ChevronLeft className="h-4 w-4 mr-2" />
+                Previous
+              </Button>
+              <Button 
+                onClick={() => setCurrentStep(1)}
+                className="bg-cyber-primary hover:bg-blue-700"
+              >
+                Next
+                <ChevronRight className="h-4 w-4 ml-2" />
+              </Button>
+            </div>
+          </div>
+        );
+      case 1:
+      case 2:
+      case 3:
+        const moduleIndex = currentStep - 1;
+        const module = selectedScenario.content.modules?.[moduleIndex];
+        if (!module) return null;
+        return (
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">{module.title}</h3>
+            <p className="text-gray-600">{module.content}</p>
+            <div>
+              <h4 className="font-medium mb-2">Key Points:</h4>
+              <ul className="list-disc list-inside space-y-1">
+                {module.keyPoints?.map((point: string, index: number) => (
+                  <li key={index} className="text-sm text-gray-600">{point}</li>
+                ))}
+              </ul>
+            </div>
+            <div className="flex justify-between">
+              <Button 
+                variant="outline" 
+                onClick={() => setCurrentStep(currentStep - 1)}
+              >
+                <ChevronLeft className="h-4 w-4 mr-2" />
+                Previous
+              </Button>
+              <Button 
+                onClick={() => setCurrentStep(currentStep + 1)}
+                className="bg-cyber-primary hover:bg-blue-700"
+              >
+                {currentStep === 3 ? "Start Exercises" : "Next"}
+                <ChevronRight className="h-4 w-4 ml-2" />
+              </Button>
+            </div>
+          </div>
+        );
+      default:
+        const exerciseIndex = currentStep - 4;
+        const exercise = selectedScenario.content.practicalExercises?.[exerciseIndex];
+        if (!exercise) return (
+          <div className="text-center space-y-4">
+            <CheckCircle className="h-12 w-12 text-cyber-success mx-auto" />
+            <h3 className="text-lg font-semibold">Training Complete!</h3>
+            <p className="text-gray-600">You've successfully completed the {selectedScenario.title} training module.</p>
+            <Badge className="bg-cyber-success bg-opacity-20 text-cyber-success">
+              Certificate Earned
+            </Badge>
+          </div>
+        );
+        return (
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Practical Exercise</h3>
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <h4 className="font-medium text-blue-900">{exercise.title}</h4>
+              <p className="text-blue-800 mt-1">{exercise.description}</p>
+              <p className="text-sm text-blue-600 mt-2">Estimated time: {exercise.timeEstimate}</p>
+            </div>
+            <Button 
+              className="w-full bg-cyber-primary hover:bg-blue-700"
+              onClick={() => {
+                setCurrentExercise(exercise);
+                setExerciseStep(0);
+                setExerciseScore(0);
+                setSelectedAnswer("");
+                setShowResults(false);
+                setShowExerciseModal(true);
+              }}
+            >
+              <Play className="h-4 w-4 mr-2" />
+              Start Exercise
+            </Button>
+          </div>
+        );
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">

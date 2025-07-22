@@ -31,6 +31,8 @@ Preferred communication style: Simple, everyday language.
 ✓ **Database Constraints Fixed** - Resolved foreign key constraint issues by using valid user IDs for simulation creation
 ✓ **Simulation Creation Working** - Fixed validation errors and improved UI with pre-selected target audiences and clear visual indicators
 ✓ **Redundant Features Removed** - Eliminated duplicate "AI Coach" action that was redundant with "New Phishing Test"
+✓ **Compliance Reports Removed** - Completely removed all compliance reporting features from Email Center and backend
+✓ **Department Targeting Added** - Added enterprise department selection checkboxes to all Email Center sections (Phishing, Security Alerts, Custom Email)
 
 ## System Architecture
 

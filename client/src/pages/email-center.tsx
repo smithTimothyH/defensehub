@@ -47,7 +47,8 @@ export default function EmailCenter() {
     title: '',
     severity: 'Medium',
     description: '',
-    recommendations: ''
+    recommendations: '',
+    targetDepartments: [] as string[]
   });
 
   // Custom email form
@@ -55,7 +56,8 @@ export default function EmailCenter() {
     to: '',
     subject: '',
     text: '',
-    html: ''
+    html: '',
+    targetDepartments: [] as string[]
   });
 
   // Send phishing email mutation
@@ -94,7 +96,8 @@ export default function EmailCenter() {
             severity: data.severity,
             description: data.description,
             recommendations: data.recommendations.split('\n').filter((r: string) => r.trim())
-          }
+          },
+          targetDepartments: data.targetDepartments
         })
       });
       return await response.json();
@@ -111,7 +114,13 @@ export default function EmailCenter() {
       const response = await fetch('/api/email/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+        body: JSON.stringify({
+          to: data.to,
+          subject: data.subject,
+          text: data.text,
+          html: data.html,
+          targetDepartments: data.targetDepartments
+        })
       });
       return await response.json();
     },
@@ -313,7 +322,7 @@ export default function EmailCenter() {
                 <span>Send Security Alert</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="alert-to">Recipient Email(s)</Label>
@@ -342,6 +351,52 @@ export default function EmailCenter() {
                   </Select>
                 </div>
               </div>
+
+              <div>
+                <Label className="text-sm font-medium text-gray-700 mb-3 block">
+                  <Users className="h-4 w-4 inline mr-2" />
+                  Target Departments
+                </Label>
+                <div className="grid grid-cols-2 gap-3 p-4 border rounded-lg bg-gray-50">
+                  {[
+                    "IT Department",
+                    "Human Resources", 
+                    "Finance",
+                    "Marketing",
+                    "Sales",
+                    "Operations",
+                    "Legal",
+                    "Executive Team"
+                  ].map((department) => (
+                    <div key={department} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`alert-${department}`}
+                        checked={alertForm.targetDepartments.includes(department)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setAlertForm({
+                              ...alertForm,
+                              targetDepartments: [...alertForm.targetDepartments, department]
+                            });
+                          } else {
+                            setAlertForm({
+                              ...alertForm,
+                              targetDepartments: alertForm.targetDepartments.filter(d => d !== department)
+                            });
+                          }
+                        }}
+                      />
+                      <Label htmlFor={`alert-${department}`} className="text-sm font-medium cursor-pointer">
+                        {department}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  Select departments to notify about security incidents
+                </p>
+              </div>
+
               <div>
                 <Label htmlFor="alert-title">Alert Title</Label>
                 <Input
@@ -369,6 +424,16 @@ export default function EmailCenter() {
                   onChange={(e) => setAlertForm({ ...alertForm, recommendations: e.target.value })}
                 />
               </div>
+              <div className="flex items-center justify-between p-3 bg-red-50 border border-red-200 rounded-lg">
+                <div className="text-sm text-red-800">
+                  <strong>Target Summary:</strong> 
+                  {alertForm.targetDepartments.length > 0 ? (
+                    <span> {alertForm.targetDepartments.length} department(s) selected</span>
+                  ) : (
+                    <span> Individual email only</span>
+                  )}
+                </div>
+              </div>
               <Button 
                 onClick={() => sendSecurityAlert.mutate(alertForm)}
                 disabled={sendSecurityAlert.isPending || !alertForm.to || !alertForm.title}
@@ -392,7 +457,7 @@ export default function EmailCenter() {
                 <span>Send Custom Email</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="custom-to">Recipient Email</Label>
@@ -414,6 +479,52 @@ export default function EmailCenter() {
                   />
                 </div>
               </div>
+
+              <div>
+                <Label className="text-sm font-medium text-gray-700 mb-3 block">
+                  <Users className="h-4 w-4 inline mr-2" />
+                  Target Departments
+                </Label>
+                <div className="grid grid-cols-2 gap-3 p-4 border rounded-lg bg-gray-50">
+                  {[
+                    "IT Department",
+                    "Human Resources", 
+                    "Finance",
+                    "Marketing",
+                    "Sales",
+                    "Operations",
+                    "Legal",
+                    "Executive Team"
+                  ].map((department) => (
+                    <div key={department} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`custom-${department}`}
+                        checked={customForm.targetDepartments.includes(department)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setCustomForm({
+                              ...customForm,
+                              targetDepartments: [...customForm.targetDepartments, department]
+                            });
+                          } else {
+                            setCustomForm({
+                              ...customForm,
+                              targetDepartments: customForm.targetDepartments.filter(d => d !== department)
+                            });
+                          }
+                        }}
+                      />
+                      <Label htmlFor={`custom-${department}`} className="text-sm font-medium cursor-pointer">
+                        {department}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  Select departments for enterprise-wide communications
+                </p>
+              </div>
+
               <div>
                 <Label htmlFor="custom-text">Message (Plain Text)</Label>
                 <Textarea
@@ -431,6 +542,16 @@ export default function EmailCenter() {
                   value={customForm.html}
                   onChange={(e) => setCustomForm({ ...customForm, html: e.target.value })}
                 />
+              </div>
+              <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
+                <div className="text-sm text-green-800">
+                  <strong>Target Summary:</strong> 
+                  {customForm.targetDepartments.length > 0 ? (
+                    <span> {customForm.targetDepartments.length} department(s) selected</span>
+                  ) : (
+                    <span> Individual email only</span>
+                  )}
+                </div>
               </div>
               <Button 
                 onClick={() => sendCustomEmail.mutate(customForm)}

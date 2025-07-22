@@ -199,6 +199,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Launch phishing campaign
+  app.post("/api/phishing-campaigns", async (req, res) => {
+    try {
+      const { campaignName, emails, simulationId } = req.body;
+      
+      if (!campaignName || !emails || !simulationId) {
+        return res.status(400).json({ message: "Missing required fields: campaignName, emails, simulationId" });
+      }
+
+      // Parse email addresses
+      const emailList = emails.split('\n').map((email: string) => email.trim()).filter((email: string) => email.length > 0);
+      
+      if (emailList.length === 0) {
+        return res.status(400).json({ message: "No valid email addresses provided" });
+      }
+
+      // Create a new simulation entry for this campaign
+      const campaign = await storage.createSimulation({
+        name: campaignName,
+        description: `Phishing campaign targeting ${emailList.length} users`,
+        type: 'phishing',
+        status: 'active',
+        targetAudience: ['custom'],
+        userId: 1 // Default user for now
+      });
+
+      // Send phishing emails to all targets
+      const results = [];
+      for (const email of emailList) {
+        try {
+          const result = await emailService.sendPhishingSimulation([email], {
+            subject: "Important: Account Verification Required",
+            scenario: "account_verification"
+          });
+          results.push({ email, status: 'sent', result });
+        } catch (emailError: any) {
+          results.push({ email, status: 'failed', error: emailError?.message || 'Unknown error' });
+        }
+      }
+
+      res.json({
+        campaignId: campaign.id,
+        campaignName,
+        targetCount: emailList.length,
+        results,
+        message: "Phishing campaign launched successfully"
+      });
+      
+    } catch (error) {
+      console.error('Phishing campaign error:', error);
+      res.status(500).json({ message: "Failed to launch phishing campaign" });
+    }
+  });
+
 
 
   // Get user interactions

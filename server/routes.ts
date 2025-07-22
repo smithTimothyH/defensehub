@@ -121,6 +121,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const simulationId = parseInt(req.params.id);
       const config = req.body as PhishingScenarioConfig;
       
+      console.log('Generating phishing scenario for simulation:', simulationId, 'with config:', config);
+      
       const scenario = await generatePhishingScenario(config);
       
       const savedScenario = await storage.createPhishingScenario({
@@ -134,7 +136,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(savedScenario);
     } catch (error) {
-      res.status(500).json({ message: "Failed to generate phishing scenario" });
+      console.error('Phishing scenario generation error:', error);
+      res.status(500).json({ 
+        message: "Failed to generate phishing scenario", 
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
     }
   });
 

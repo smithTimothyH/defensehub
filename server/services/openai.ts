@@ -82,7 +82,83 @@ Respond in JSON format with the following structure:
     };
   } catch (error) {
     console.error("Error generating phishing scenario:", error);
-    throw new Error("Failed to generate phishing scenario");
+    
+    // Fallback to pre-defined scenarios when OpenAI fails
+    const fallbackScenarios = {
+      basic: {
+        subject: "Action Required: Verify Your Account",
+        content: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px;">
+            <h2 style="color: #1a73e8;">Account Verification Required</h2>
+            <p>Dear User,</p>
+            <p>We have detected unusual activity on your account. For your security, please verify your identity by clicking the link below:</p>
+            <p><a href="http://suspicious-link.example.com/verify" style="background: #1a73e8; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;">Verify Account</a></p>
+            <p>If you do not verify within 24 hours, your account will be suspended.</p>
+            <p>Best regards,<br>Security Team</p>
+          </div>
+        `,
+        indicators: [
+          "Generic greeting instead of personalized name",
+          "Creates urgency with account suspension threat",
+          "Suspicious URL domain",
+          "Poor grammar and formatting",
+          "Requests immediate action"
+        ]
+      },
+      intermediate: {
+        subject: "Important: System Maintenance Notification",
+        content: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px;">
+            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjUwIiB2aWV3Qm94PSIwIDAgMjAwIDUwIj48dGV4dCB4PSIxMCIgeT0iMzAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIyMCIgZmlsbD0iIzMzNyI+Q29tcGFueSBMb2dvPC90ZXh0Pjwvc3ZnPg==" alt="Company Logo" style="margin-bottom: 20px;">
+            <h2 style="color: #d73527;">Scheduled System Maintenance</h2>
+            <p>Dear Team Member,</p>
+            <p>Our IT department will be performing critical system maintenance this weekend. To ensure uninterrupted access to your files, please backup your data using our secure portal:</p>
+            <p><a href="http://backup-portal-secure.net/login" style="background: #d73527; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">Access Backup Portal</a></p>
+            <p>This maintenance is mandatory and failure to backup may result in data loss.</p>
+            <p>Technical Support Team<br>IT Department</p>
+          </div>
+        `,
+        indicators: [
+          "Uses company-like branding but generic logo",
+          "Creates fear of data loss",
+          "External domain not matching company",
+          "Urgent deadline pressure",
+          "Requests credential entry on external site"
+        ]
+      },
+      advanced: {
+        subject: "Re: Q4 Budget Review - Action Items",
+        content: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px;">
+            <p style="color: #666; font-size: 12px;">This message was sent from: accounting@company-internal.org</p>
+            <h3 style="color: #2d5aa0;">Budget Review Follow-up</h3>
+            <p>Hi there,</p>
+            <p>Following our meeting yesterday, I've compiled the budget adjustments as requested. The revised spreadsheet includes the Q4 allocations we discussed.</p>
+            <p>Please review the attached document and confirm the changes by EOD:</p>
+            <p><a href="http://docs-sharing-platform.net/download/budget-q4-final.xlsx" style="color: #2d5aa0; text-decoration: underline;">Q4_Budget_Review_Final.xlsx</a></p>
+            <p>Let me know if you have any questions about the revised numbers.</p>
+            <p>Best,<br>Sarah Mitchell<br>Finance Team</p>
+            <p style="font-size: 11px; color: #999;">This email was sent from a secure company server. If you received this in error, please delete immediately.</p>
+          </div>
+        `,
+        indicators: [
+          "Domain spoofing with similar but incorrect domain",
+          "Uses realistic business context and names",
+          "External file download link",
+          "Professional formatting to build trust",
+          "References to recent meetings to establish credibility",
+          "Adds false security notice to appear legitimate"
+        ]
+      }
+    };
+
+    const scenario = fallbackScenarios[config.difficulty] || fallbackScenarios.basic;
+    return {
+      subject: scenario.subject,
+      content: scenario.content,
+      indicators: scenario.indicators,
+      difficulty: config.difficulty,
+    };
   }
 }
 

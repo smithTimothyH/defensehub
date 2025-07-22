@@ -251,23 +251,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Send compliance report
-  app.post("/api/email/compliance-report", async (req, res) => {
-    try {
-      const { to, reportData } = req.body;
-      
-      if (!to || !reportData) {
-        return res.status(400).json({ message: "Missing required fields: to, reportData" });
-      }
 
-
-
-      const result = await emailService.sendComplianceReport(to, reportData);
-      res.json(result);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to send compliance report" });
-    }
-  });
 
   // Send security alert
   app.post("/api/email/security-alert", async (req, res) => {

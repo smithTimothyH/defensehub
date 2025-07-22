@@ -118,38 +118,15 @@ export default function EmailCenter() {
     }
   });
 
-  // Send compliance report mutation
-  const sendComplianceReport = useMutation({
-    mutationFn: async (to: string) => {
-      const reportData = {
-        overallScore: 87,
-        frameworks: [
-          { name: 'NIST CSF', score: 92 },
-          { name: 'ISO 27001', score: 89 },
-          { name: 'GDPR', score: 95 },
-          { name: 'SOC 2', score: 72 }
-        ]
-      };
-      
-      const response = await fetch('/api/email/compliance-report', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ to, reportData })
-      });
-      return await response.json();
-    },
-    onSuccess: (data) => {
-      setEmailResult(data);
-      queryClient.invalidateQueries({ queryKey: ['/api/audit-logs'] });
-    }
-  });
+
+
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Email Center</h2>
-          <p className="text-gray-600">Send phishing simulations, security alerts, and compliance reports</p>
+          <p className="text-gray-600">Send phishing simulations and security alerts</p>
         </div>
         <div className="flex items-center space-x-2">
           <Badge variant={(connectionStatus as any)?.success ? "default" : "destructive"}>
@@ -194,7 +171,7 @@ export default function EmailCenter() {
       )}
 
       <Tabs defaultValue="phishing" className="space-y-6">
-        <TabsList className="grid grid-cols-4 w-full">
+        <TabsList className="grid grid-cols-3 w-full">
           <TabsTrigger value="phishing" className="flex items-center space-x-2">
             <Shield className="h-4 w-4" />
             <span>Phishing Simulation</span>
@@ -202,10 +179,6 @@ export default function EmailCenter() {
           <TabsTrigger value="alerts" className="flex items-center space-x-2">
             <AlertTriangle className="h-4 w-4" />
             <span>Security Alerts</span>
-          </TabsTrigger>
-          <TabsTrigger value="reports" className="flex items-center space-x-2">
-            <FileText className="h-4 w-4" />
-            <span>Compliance Reports</span>
           </TabsTrigger>
           <TabsTrigger value="custom" className="flex items-center space-x-2">
             <MessageSquare className="h-4 w-4" />
@@ -349,46 +322,7 @@ export default function EmailCenter() {
           </Card>
         </TabsContent>
 
-        {/* Compliance Reports */}
-        <TabsContent value="reports">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <FileText className="h-5 w-5 text-cyber-primary" />
-                <span>Send Compliance Report</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="report-to">Recipient Email(s)</Label>
-                <Input
-                  id="report-to"
-                  type="email"
-                  placeholder="compliance@company.com, ceo@company.com"
-                  onChange={(e) => setCustomForm({ ...customForm, to: e.target.value })}
-                />
-              </div>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h4 className="font-medium text-gray-900 mb-2">Report Preview</h4>
-                <div className="space-y-2 text-sm text-gray-600">
-                  <p>• Overall Compliance Score: 87%</p>
-                  <p>• NIST CSF: 92%</p>
-                  <p>• ISO 27001: 89%</p>
-                  <p>• GDPR: 95%</p>
-                  <p>• SOC 2: 72%</p>
-                </div>
-              </div>
-              <Button 
-                onClick={() => sendComplianceReport.mutate(customForm.to)}
-                disabled={sendComplianceReport.isPending || !customForm.to}
-                className="w-full"
-              >
-                <FileText className="h-4 w-4 mr-2" />
-                {sendComplianceReport.isPending ? 'Sending...' : 'Send Compliance Report'}
-              </Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
+
 
         {/* Custom Email */}
         <TabsContent value="custom">

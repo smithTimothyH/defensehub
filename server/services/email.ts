@@ -181,51 +181,7 @@ Accounts Receivable`,
     }
   }
 
-  // Send compliance report
-  async sendComplianceReport(to: string | string[], reportData: any) {
-    const subject = `Compliance Report - ${new Date().toLocaleDateString()}`;
-    const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto;">
-        <div style="background-color: #1e40af; color: white; padding: 20px;">
-          <h1>📊 Compliance Report</h1>
-          <p>Generated on ${new Date().toLocaleDateString()}</p>
-        </div>
-        <div style="padding: 20px;">
-          <h2>Overall Compliance Score</h2>
-          <div style="background-color: #dbeafe; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <div style="font-size: 2em; font-weight: bold; color: #1e40af;">${reportData.overallScore}%</div>
-            <p>Security compliance across all frameworks</p>
-          </div>
-          
-          <h2>Framework Breakdown</h2>
-          ${reportData.frameworks?.map((framework: any) => `
-            <div style="border: 1px solid #e5e7eb; padding: 15px; margin: 10px 0; border-radius: 5px;">
-              <strong>${framework.name}</strong>: ${framework.score}%
-              <div style="background-color: #f3f4f6; height: 8px; border-radius: 4px; margin-top: 5px;">
-                <div style="background-color: ${framework.score >= 90 ? '#10b981' : framework.score >= 75 ? '#f59e0b' : '#ef4444'}; height: 8px; width: ${framework.score}%; border-radius: 4px;"></div>
-              </div>
-            </div>
-          `).join('') || '<p>No framework data available</p>'}
-          
-          <div style="margin-top: 30px; padding: 20px; background-color: #f9fafb; border-radius: 8px;">
-            <p><strong>This report was generated automatically by DefenseHub.</strong></p>
-            <p>For detailed analysis, please log into your dashboard.</p>
-          </div>
-        </div>
-      </div>
-    `;
 
-    const text = `Compliance Report - ${new Date().toLocaleDateString()}
-    
-Overall Compliance Score: ${reportData.overallScore}%
-
-Framework Breakdown:
-${reportData.frameworks?.map((f: any) => `- ${f.name}: ${f.score}%`).join('\n') || 'No framework data available'}
-
-This report was generated automatically by DefenseHub.`;
-
-    return await this.sendEmail(to, subject, text, html);
-  }
 
   // Send security alert
   async sendSecurityAlert(to: string | string[], alertData: any) {

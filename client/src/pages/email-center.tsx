@@ -21,6 +21,7 @@ import {
   Users,
   MessageSquare
 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function EmailCenter() {
   const [emailResult, setEmailResult] = useState<any>(null);
@@ -36,7 +37,8 @@ export default function EmailCenter() {
   const [phishingForm, setPhishingForm] = useState({
     to: '',
     scenarioType: 'urgent-security',
-    targetUrl: 'https://example-phishing-site.com/login'
+    targetUrl: 'https://example-phishing-site.com/login',
+    targetDepartments: [] as string[]
   });
 
   // Security alert form
@@ -67,7 +69,8 @@ export default function EmailCenter() {
           scenario: {
             type: data.scenarioType,
             targetUrl: data.targetUrl
-          }
+          },
+          targetDepartments: data.targetDepartments
         })
       });
       return await response.json();
@@ -195,7 +198,7 @@ export default function EmailCenter() {
                 <span>Send Phishing Simulation</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="phishing-to">Target Email</Label>
@@ -224,6 +227,52 @@ export default function EmailCenter() {
                   </Select>
                 </div>
               </div>
+
+              <div>
+                <Label className="text-sm font-medium text-gray-700 mb-3 block">
+                  <Users className="h-4 w-4 inline mr-2" />
+                  Target Departments
+                </Label>
+                <div className="grid grid-cols-2 gap-3 p-4 border rounded-lg bg-gray-50">
+                  {[
+                    "IT Department",
+                    "Human Resources", 
+                    "Finance",
+                    "Marketing",
+                    "Sales",
+                    "Operations",
+                    "Legal",
+                    "Executive Team"
+                  ].map((department) => (
+                    <div key={department} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={department}
+                        checked={phishingForm.targetDepartments.includes(department)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setPhishingForm({
+                              ...phishingForm,
+                              targetDepartments: [...phishingForm.targetDepartments, department]
+                            });
+                          } else {
+                            setPhishingForm({
+                              ...phishingForm,
+                              targetDepartments: phishingForm.targetDepartments.filter(d => d !== department)
+                            });
+                          }
+                        }}
+                      />
+                      <Label htmlFor={department} className="text-sm font-medium cursor-pointer">
+                        {department}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  Select departments to simulate enterprise-wide phishing campaigns
+                </p>
+              </div>
+
               <div>
                 <Label htmlFor="target-url">Target URL (for tracking)</Label>
                 <Input
@@ -232,6 +281,16 @@ export default function EmailCenter() {
                   value={phishingForm.targetUrl}
                   onChange={(e) => setPhishingForm({ ...phishingForm, targetUrl: e.target.value })}
                 />
+              </div>
+              <div className="flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="text-sm text-blue-800">
+                  <strong>Target Summary:</strong> 
+                  {phishingForm.targetDepartments.length > 0 ? (
+                    <span> {phishingForm.targetDepartments.length} department(s) selected</span>
+                  ) : (
+                    <span> Individual email only</span>
+                  )}
+                </div>
               </div>
               <Button 
                 onClick={() => sendPhishingEmail.mutate(phishingForm)}

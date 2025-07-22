@@ -550,9 +550,9 @@ export default function Reports() {
                     <Badge variant="secondary" className="bg-cyber-success bg-opacity-20 text-cyber-success">
                       {report.status}
                     </Badge>
-                    <Button variant="outline" size="sm" onClick={() => window.open(report.downloadUrl, '_blank')}>
+                    <Button variant="outline" size="sm" onClick={() => window.open(`/api/reports/download/${report.id}?format=html`, '_blank')}>
                       <Download className="h-4 w-4 mr-2" />
-                      Download
+                      View Report
                     </Button>
                   </div>
                 </div>

@@ -336,7 +336,19 @@ export default function TrainingScenarios() {
               <p className="text-blue-800 mt-1">{exercise.description}</p>
               <p className="text-sm text-blue-600 mt-2">Estimated time: {exercise.timeEstimate}</p>
             </div>
-            <Button className="w-full bg-cyber-primary hover:bg-blue-700">
+            <Button 
+              className="w-full bg-cyber-primary hover:bg-blue-700"
+              onClick={() => {
+                // Start the practical exercise
+                if (exercise.title === "Phone Call Simulation") {
+                  alert("Phone Call Simulation Exercise\n\nScenario: You receive a call from someone claiming to be from IT support asking for your login credentials to 'fix a security issue'.\n\nYour task: Identify the red flags and determine the appropriate response.\n\nRed flags to look for:\n• Unsolicited call asking for credentials\n• Creating urgency ('security issue')\n• Requesting sensitive information over phone\n\nCorrect response: Hang up and verify through official IT channels.");
+                } else if (exercise.title === "Pretext Recognition") {
+                  alert("Pretext Recognition Exercise\n\nScenario: An email claims to be from your CEO requesting urgent wire transfer information for a 'confidential acquisition'.\n\nYour task: Analyze the email for social engineering tactics.\n\nSocial engineering tactics:\n• Authority (claiming to be CEO)\n• Urgency (urgent request)\n• Secrecy (confidential acquisition)\n• Financial request (wire transfer)\n\nCorrect response: Verify through separate communication channel before taking any action.");
+                } else {
+                  alert(`Starting ${exercise.title} exercise...\n\nThis interactive exercise will help you practice identifying and responding to social engineering attacks in a safe environment.`);
+                }
+              }}
+            >
               <Play className="h-4 w-4 mr-2" />
               Start Exercise
             </Button>

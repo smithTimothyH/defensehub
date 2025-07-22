@@ -38,14 +38,6 @@ export default function QuickActions() {
       bgColor: "bg-green-100",
       iconColor: "text-cyber-success",
     },
-    {
-      id: "coach",
-      title: "AI Coach",
-      description: "Get training insights",
-      icon: Bot,
-      bgColor: "bg-purple-100",
-      iconColor: "text-purple-600",
-    },
   ];
 
   return (
@@ -62,7 +54,7 @@ export default function QuickActions() {
                 key={action.id}
                 variant="ghost"
                 className="w-full flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors h-auto"
-                onClick={() => handleActionClick(action.id)}
+                onClick={() => action.id === "report" ? window.location.href = "/reports" : handleActionClick(action.id)}
               >
                 <div className="flex items-center space-x-3">
                   <div className={`w-8 h-8 ${action.bgColor} rounded-lg flex items-center justify-center`}>

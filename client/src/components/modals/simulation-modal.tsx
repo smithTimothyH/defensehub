@@ -16,7 +16,7 @@ interface SimulationModalProps {
 
 export default function SimulationModal({ isOpen, onClose, actionType }: SimulationModalProps) {
   const [simulationType, setSimulationType] = useState("phishing");
-  const [targetAudience, setTargetAudience] = useState<string[]>([]);
+  const [targetAudience, setTargetAudience] = useState<string[]>(["All Employees"]);
   const [complexity, setComplexity] = useState("intermediate");
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -122,10 +122,10 @@ export default function SimulationModal({ isOpen, onClose, actionType }: Simulat
           </div>
 
           <div>
-            <Label className="text-sm font-medium text-gray-700 mb-2 block">
-              Target Audience
+            <Label className="text-sm font-medium text-gray-700 mb-3 block">
+              Target Audience <span className="text-red-500">*</span>
             </Label>
-            <div className="flex flex-wrap gap-4">
+            <div className="grid grid-cols-2 gap-3 p-3 border rounded-lg bg-gray-50">
               {["All Employees", "IT Department", "Management", "HR", "Finance"].map((audience) => (
                 <div key={audience} className="flex items-center space-x-2">
                   <Checkbox
@@ -133,12 +133,13 @@ export default function SimulationModal({ isOpen, onClose, actionType }: Simulat
                     checked={targetAudience.includes(audience)}
                     onCheckedChange={(checked) => handleTargetAudienceChange(audience, checked as boolean)}
                   />
-                  <Label htmlFor={audience} className="text-sm text-gray-700">
+                  <Label htmlFor={audience} className="text-sm font-medium cursor-pointer">
                     {audience}
                   </Label>
                 </div>
               ))}
             </div>
+            <p className="text-xs text-gray-500 mt-2">Select at least one target audience for the simulation</p>
           </div>
 
           <div>

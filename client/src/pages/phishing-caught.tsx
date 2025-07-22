@@ -141,7 +141,7 @@ export default function PhishingCaught() {
           </div>
 
           <div className="text-center text-xs text-gray-600 border-t border-gray-700 pt-4">
-            SentinelSim Cybersecurity Training Platform • This was a controlled phishing simulation
+            DefenseHub Cybersecurity Training Platform • This was a controlled phishing simulation
           </div>
         </CardContent>
       </Card>

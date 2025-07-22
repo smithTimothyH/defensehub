@@ -28,8 +28,8 @@ export default function Sidebar() {
             <Shield className="text-white text-xl" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-gray-900">SentinelSim</h1>
-            <p className="text-sm text-gray-500">GRC Simulator</p>
+            <h1 className="text-xl font-bold text-gray-900">DefenseHub</h1>
+            <p className="text-sm text-gray-500">Security Training Platform</p>
           </div>
         </div>
       </div>

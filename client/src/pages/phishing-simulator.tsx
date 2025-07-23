@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Fish, Zap, Brain, Target, Star, Shield, Mail, Eye, Play, AlertTriangle, Trophy, Users, FileText, CheckCircle, ArrowRight, TrendingUp, Lightbulb, Clock, Award } from "lucide-react";
+import { Fish, Zap, Brain, Target, Star, Shield, Mail, Eye, Play, AlertTriangle, Trophy, Users, FileText, CheckCircle, ArrowRight, TrendingUp, Lightbulb, Clock, Award, Building, UserCheck } from "lucide-react";
 
 export default function PhishingSimulator() {
   const [selectedSimulation, setSelectedSimulation] = useState<number | null>(null);
@@ -21,6 +21,8 @@ export default function PhishingSimulator() {
   const [showCoachDialog, setShowCoachDialog] = useState(false);
   const [campaignName, setCampaignName] = useState("");
   const [campaignEmails, setCampaignEmails] = useState("");
+  const [targetingMode, setTargetingMode] = useState<"individual" | "departments">("individual");
+  const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
   
   // Calculate real skill level from simulation data
   const { data: simulations } = useQuery({
@@ -40,6 +42,133 @@ export default function PhishingSimulator() {
   const [coachingMessage, setCoachingMessage] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Department email lists for targeting
+  const departmentEmails = {
+    executive: [
+      "ceo@company.com",
+      "cfo@company.com", 
+      "cto@company.com",
+      "coo@company.com",
+      "president@company.com"
+    ],
+    legal: [
+      "legal@company.com",
+      "counsel@company.com",
+      "compliance@company.com",
+      "contracts@company.com",
+      "legal.director@company.com"
+    ],
+    hr: [
+      "hr@company.com",
+      "recruiter@company.com",
+      "benefits@company.com",
+      "hr.director@company.com",
+      "talent@company.com"
+    ],
+    customerService: [
+      "support@company.com",
+      "service@company.com",
+      "help@company.com", 
+      "care@company.com",
+      "cs.manager@company.com"
+    ],
+    finance: [
+      "finance@company.com",
+      "accounting@company.com",
+      "payroll@company.com",
+      "billing@company.com",
+      "finance.director@company.com"
+    ],
+    it: [
+      "it@company.com",
+      "support@company.com",
+      "admin@company.com",
+      "security@company.com",
+      "it.director@company.com"
+    ],
+    marketing: [
+      "marketing@company.com",
+      "pr@company.com",
+      "social@company.com",
+      "campaigns@company.com",
+      "marketing.director@company.com"
+    ],
+    sales: [
+      "sales@company.com",
+      "business@company.com",
+      "sales.manager@company.com",
+      "revenue@company.com",
+      "account@company.com"
+    ]
+  };
+
+  const departmentInfo = [
+    { 
+      id: "executive",
+      name: "Executive Team", 
+      description: "C-suite and senior leadership",
+      count: departmentEmails.executive.length,
+      icon: <Building className="h-4 w-4" />,
+      riskLevel: "Critical"
+    },
+    { 
+      id: "legal",
+      name: "Legal Department", 
+      description: "Legal and compliance team",
+      count: departmentEmails.legal.length,
+      icon: <FileText className="h-4 w-4" />,
+      riskLevel: "High"
+    },
+    { 
+      id: "hr",
+      name: "Human Resources", 
+      description: "HR and talent management",
+      count: departmentEmails.hr.length,
+      icon: <UserCheck className="h-4 w-4" />,
+      riskLevel: "High"
+    },
+    { 
+      id: "customerService",
+      name: "Customer Service", 
+      description: "Customer support and care",
+      count: departmentEmails.customerService.length,
+      icon: <Users className="h-4 w-4" />,
+      riskLevel: "Medium"
+    },
+    { 
+      id: "finance",
+      name: "Finance & Accounting", 
+      description: "Financial operations team",
+      count: departmentEmails.finance.length,
+      icon: <TrendingUp className="h-4 w-4" />,
+      riskLevel: "High"
+    },
+    { 
+      id: "it",
+      name: "IT Department", 
+      description: "Technology and security team",
+      count: departmentEmails.it.length,
+      icon: <Shield className="h-4 w-4" />,
+      riskLevel: "Critical"
+    },
+    { 
+      id: "marketing",
+      name: "Marketing & PR", 
+      description: "Marketing and communications",
+      count: departmentEmails.marketing.length,
+      icon: <Lightbulb className="h-4 w-4" />,
+      riskLevel: "Medium"
+    },
+    { 
+      id: "sales",
+      name: "Sales Team", 
+      description: "Business development and sales",
+      count: departmentEmails.sales.length,
+      icon: <Target className="h-4 w-4" />,
+      riskLevel: "Medium"
+    }
+  ];
 
   const coachingSuggestions = [
     "Check sender address carefully for suspicious domains",
@@ -109,6 +238,8 @@ export default function PhishingSimulator() {
       setShowLaunchDialog(false);
       setCampaignName("");
       setCampaignEmails("");
+      setTargetingMode("individual");
+      setSelectedDepartments([]);
       queryClient.invalidateQueries({ queryKey: ["/api/simulations"] });
     },
     onError: () => {
@@ -148,23 +279,64 @@ export default function PhishingSimulator() {
   const handleLaunchCampaign = (simulation: any) => {
     setSelectedCampaign(simulation);
     setCampaignName(simulation.name + " - " + new Date().toLocaleDateString());
+    setTargetingMode("individual");
+    setSelectedDepartments([]);
     setShowLaunchDialog(true);
   };
 
+  const handleDepartmentToggle = (departmentId: string) => {
+    setSelectedDepartments(prev => 
+      prev.includes(departmentId) 
+        ? prev.filter(id => id !== departmentId)
+        : [...prev, departmentId]
+    );
+  };
+
+  const getRiskLevelColor = (riskLevel: string) => {
+    switch (riskLevel) {
+      case "Critical": return "text-red-600 bg-red-50 border-red-200";
+      case "High": return "text-orange-600 bg-orange-50 border-orange-200";
+      case "Medium": return "text-yellow-600 bg-yellow-50 border-yellow-200";
+      default: return "text-gray-600 bg-gray-50 border-gray-200";
+    }
+  };
+
   const handleLaunchSubmit = () => {
-    if (!campaignEmails.trim()) {
-      toast({
-        title: "Missing Email Addresses",
-        description: "Please enter email addresses to send the campaign to.",
-        variant: "destructive",
-      });
-      return;
+    let emails = "";
+    
+    if (targetingMode === "individual") {
+      if (!campaignEmails.trim()) {
+        toast({
+          title: "Missing Email Addresses",
+          description: "Please enter email addresses to send the campaign to.",
+          variant: "destructive",
+        });
+        return;
+      }
+      emails = campaignEmails;
+    } else {
+      if (selectedDepartments.length === 0) {
+        toast({
+          title: "No Departments Selected",
+          description: "Please select at least one department to target.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // Combine all emails from selected departments
+      const departmentEmailsList = selectedDepartments.flatMap(dept => 
+        departmentEmails[dept as keyof typeof departmentEmails] || []
+      );
+      emails = departmentEmailsList.join("\n");
     }
 
     launchCampaignMutation.mutate({
       campaignName,
-      emails: campaignEmails,
-      simulationId: selectedCampaign.id
+      emails,
+      simulationId: selectedCampaign.id,
+      targetingMode,
+      departments: targetingMode === "departments" ? selectedDepartments : undefined
     });
   };
 
@@ -424,7 +596,7 @@ export default function PhishingSimulator() {
             </DialogDescription>
           </DialogHeader>
           
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div>
               <Label htmlFor="campaign-name">Campaign Name</Label>
               <Input
@@ -435,16 +607,111 @@ export default function PhishingSimulator() {
               />
             </div>
             
+            {/* Targeting Mode Selection */}
             <div>
-              <Label htmlFor="campaign-emails">Target Email Addresses</Label>
-              <Textarea
-                id="campaign-emails"
-                value={campaignEmails}
-                onChange={(e) => setCampaignEmails(e.target.value)}
-                placeholder="Enter email addresses (one per line)"
-                rows={4}
-              />
+              <Label className="text-base font-medium">Targeting Method</Label>
+              <div className="flex gap-4 mt-2">
+                <label className="flex items-center space-x-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    value="individual"
+                    checked={targetingMode === "individual"}
+                    onChange={(e) => setTargetingMode(e.target.value as "individual" | "departments")}
+                    className="text-blue-600"
+                  />
+                  <span>Individual Email Addresses</span>
+                </label>
+                <label className="flex items-center space-x-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    value="departments"
+                    checked={targetingMode === "departments"}
+                    onChange={(e) => setTargetingMode(e.target.value as "individual" | "departments")}
+                    className="text-blue-600"
+                  />
+                  <span>Target Departments</span>
+                </label>
+              </div>
             </div>
+
+            {/* Individual Email Input */}
+            {targetingMode === "individual" && (
+              <div>
+                <Label htmlFor="campaign-emails">Target Email Addresses</Label>
+                <Textarea
+                  id="campaign-emails"
+                  value={campaignEmails}
+                  onChange={(e) => setCampaignEmails(e.target.value)}
+                  placeholder="Enter email addresses (one per line)"
+                  rows={4}
+                />
+              </div>
+            )}
+
+            {/* Department Selection */}
+            {targetingMode === "departments" && (
+              <div>
+                <Label className="text-base font-medium mb-3 block">Select Target Departments</Label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-80 overflow-y-auto">
+                  {departmentInfo.map((dept) => (
+                    <div
+                      key={dept.id}
+                      onClick={() => handleDepartmentToggle(dept.id)}
+                      className={`p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md ${
+                        selectedDepartments.includes(dept.id)
+                          ? 'border-blue-500 bg-blue-50'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          {dept.icon}
+                          <span className="font-medium">{dept.name}</span>
+                        </div>
+                        <Badge className={`text-xs ${getRiskLevelColor(dept.riskLevel)}`}>
+                          {dept.riskLevel}
+                        </Badge>
+                      </div>
+                      
+                      <p className="text-sm text-gray-600 mb-1">{dept.description}</p>
+                      <p className="text-xs text-gray-500">{dept.count} email addresses</p>
+                      
+                      {selectedDepartments.includes(dept.id) && (
+                        <div className="mt-2">
+                          <div className="text-xs text-blue-600 font-medium">✓ Selected</div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                
+                {selectedDepartments.length > 0 && (
+                  <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Trophy className="h-4 w-4 text-blue-600" />
+                      <span className="font-medium text-blue-800">Campaign Summary</span>
+                    </div>
+                    <p className="text-sm text-blue-700">
+                      Selected {selectedDepartments.length} department(s) with {
+                        selectedDepartments.reduce((total, dept) => 
+                          total + (departmentEmails[dept as keyof typeof departmentEmails]?.length || 0), 0
+                        )
+                      } total email addresses
+                    </p>
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {selectedDepartments.map((deptId) => {
+                        const dept = departmentInfo.find(d => d.id === deptId);
+                        return dept ? (
+                          <Badge key={deptId} variant="secondary" className="text-xs">
+                            {dept.name}
+                          </Badge>
+                        ) : null;
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
             
             <div className="flex space-x-3">
               <Button variant="outline" onClick={() => setShowLaunchDialog(false)}>

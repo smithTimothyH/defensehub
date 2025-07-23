@@ -6,13 +6,15 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import AdaptiveCoach from "@/components/ai-coach/adaptive-coach";
 import { 
   Brain, BookOpen, Play, Award, Star, Target, Zap, 
   Trophy, Medal, Crown, Flame, TrendingUp, Users, 
   Shield, Mail, Key, AlertTriangle, CheckCircle, Clock,
-  Gamepad2, Sparkles, ChevronRight, BarChart, PieChart
+  Gamepad2, Sparkles, ChevronRight, BarChart, PieChart, ChevronLeft
 } from "lucide-react";
 
 interface LearningModule {
@@ -58,6 +60,13 @@ export default function AIEducationHub() {
   const [userXP, setUserXP] = useState(375);
   const [userLevel, setUserLevel] = useState(2);
   const [streak, setStreak] = useState(3);
+  const [showTrainingModal, setShowTrainingModal] = useState(false);
+  const [currentModule, setCurrentModule] = useState<LearningModule | null>(null);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState("");
+  const [score, setScore] = useState(0);
+  const [showResults, setShowResults] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
   const { toast } = useToast();
 
   const [learningModules] = useState<LearningModule[]>([
@@ -248,8 +257,11 @@ export default function AIEducationHub() {
   };
 
   const startModule = (module: LearningModule) => {
-    // Navigate to training scenarios page for interactive training
-    setLocation('/training-scenarios');
+    // Start interactive training directly in this component
+    setCurrentModule(module);
+    setCurrentStep(0);
+    setSelectedAnswer("");
+    setShowTrainingModal(true);
   };
 
   const completeModule = (module: LearningModule) => {
@@ -273,6 +285,155 @@ export default function AIEducationHub() {
   useEffect(() => {
     setUserLevel(calculateLevel(userXP));
   }, [userXP]);
+
+  // Training functions from training-scenarios.tsx
+  const getExerciseTitle = (moduleTitle: string, step: number) => {
+    const titles: Record<string, string[]> = {
+      "Email Security Fundamentals": [
+        "Identifying Suspicious Emails",
+        "Verifying Email Sources", 
+        "Handling Suspicious Links",
+        "Managing Email Attachments",
+        "Reporting Security Threats",
+        "Email Security Best Practices"
+      ],
+      "Social Engineering Defense": [
+        "Recognizing Social Engineering",
+        "Phone-based Social Engineering",
+        "Physical Social Engineering", 
+        "Information Gathering Attacks",
+        "Authority-based Manipulation",
+        "Urgency-based Manipulation",
+        "Trust and Verification"
+      ],
+      "Incident Response Protocol": [
+        "Initial Incident Detection",
+        "Incident Classification",
+        "Response Team Notification",
+        "Evidence Preservation",
+        "Containment Strategies",
+        "System Recovery",
+        "Documentation Requirements",
+        "Post-Incident Analysis",
+        "External Notifications",
+        "Legal Compliance"
+      ],
+      "Password Security Mastery": [
+        "Strong Password Creation",
+        "Multi-Factor Authentication",
+        "Password Manager Usage",
+        "Account Recovery",
+        "Shared Account Security"
+      ],
+      "Network Security Basics": [
+        "WiFi Security Assessment",
+        "VPN Usage Guidelines",
+        "Safe Browsing Practices",
+        "Network Threat Recognition",
+        "Public Network Safety",
+        "Network Monitoring",
+        "Firewall Configuration",
+        "Network Access Control"
+      ],
+      "Data Protection & Privacy": [
+        "Data Classification",
+        "GDPR Compliance",
+        "Privacy Impact Assessment",
+        "Data Retention Policies",
+        "Cross-border Data Transfers",
+        "Subject Access Requests",
+        "Data Breach Notifications",
+        "Privacy by Design",
+        "Consent Management",
+        "Data Minimization",
+        "Third-party Data Sharing",
+        "Data Subject Rights"
+      ]
+    };
+    return titles[moduleTitle]?.[step] || "Security Challenge";
+  };
+
+  const getExerciseQuestion = (moduleTitle: string, step: number) => {
+    const questions: Record<string, string[]> = {
+      "Email Security Fundamentals": [
+        "You receive an urgent email from 'CEO@yourcompany.co' asking for sensitive financial data. The real company domain is 'yourcompany.com'. What's your first action?",
+        "An email claims to be from your bank asking you to verify account details. How do you verify if it's legitimate?",
+        "You get an email with a shortened URL (bit.ly link) claiming to be an important security update. What should you do?",
+        "An email attachment named 'Invoice.pdf.exe' arrives from an unknown sender. How should you handle this?",
+        "You notice an email has suspicious headers showing it originated from a different domain than claimed. What's your next step?",
+        "After identifying a phishing email, what's the proper way to report it to your security team?"
+      ],
+      "Social Engineering Defense": [
+        "Someone calls claiming to be from IT support, asking for your password to 'fix your account'. How do you respond?",
+        "A person in a delivery uniform asks you to hold the door open to the secure office area. What should you do?",
+        "During casual conversation, a stranger asks about your company's software systems. How do you handle this?",
+        "You receive a call from someone claiming to be conducting a security audit, requesting employee information. What's your response?",
+        "Someone wearing a company badge you don't recognize asks you to help them access a restricted area. What do you do?",
+        "You get a call saying there's an urgent security issue and you must act immediately or lose access. How do you respond?",
+        "A USB drive labeled 'Executive Bonus Information' is left in the parking lot. What should you do?"
+      ]
+    };
+    return questions[moduleTitle]?.[step] || "What is the best security practice in this situation?";
+  };
+
+  const getExerciseOptions = (moduleTitle: string, step: number) => {
+    const options: Record<string, Array<Array<{value: string, label: string}>>> = {
+      "Email Security Fundamentals": [
+        [
+          { value: "reply", label: "Reply immediately with the requested information" },
+          { value: "verify", label: "Contact the CEO through known channels to verify the request" },
+          { value: "ignore", label: "Delete the email without taking action" },
+          { value: "forward", label: "Forward to IT security for investigation" }
+        ],
+        [
+          { value: "click", label: "Click the link in the email to verify" },
+          { value: "call", label: "Call the bank using the number on your official bank card" },
+          { value: "search", label: "Search online for the bank's contact information" },
+          { value: "wait", label: "Wait for another email to confirm it's real" }
+        ]
+      ],
+      "Social Engineering Defense": [
+        [
+          { value: "provide", label: "Provide your password since they're from IT" },
+          { value: "verify", label: "Ask for their employee ID and verify through proper channels" },
+          { value: "refuse", label: "Refuse and hang up immediately" },
+          { value: "supervisor", label: "Ask to speak with their supervisor first" }
+        ]
+      ]
+    };
+    return options[moduleTitle]?.[step] || [
+      { value: "safe", label: "Choose the safest security practice" },
+      { value: "verify", label: "Verify through official channels first" },
+      { value: "report", label: "Report to security team immediately" },
+      { value: "wait", label: "Wait and gather more information" }
+    ];
+  };
+
+  const handleNextQuestion = () => {
+    if (!currentModule) return;
+    
+    const nextStep = currentStep + 1;
+    if (nextStep >= 6) { // Assuming 6 questions per module
+      setShowResults(true);
+    } else {
+      setCurrentStep(nextStep);
+      setSelectedAnswer("");
+    }
+  };
+
+  const completeTraining = () => {
+    if (!currentModule) return;
+    
+    setUserXP(prev => prev + currentModule.xpReward);
+    setShowResults(false);
+    setShowTrainingModal(false);
+    setShowCelebration(true);
+    
+    toast({
+      title: "Module Complete! 🎉",
+      description: `You earned ${currentModule.xpReward} XP!`,
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-6">
@@ -603,6 +764,144 @@ export default function AIEducationHub() {
                 </div>
               </div>
             )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Interactive Training Modal */}
+        <Dialog open={showTrainingModal} onOpenChange={setShowTrainingModal}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Target className="h-5 w-5 text-blue-600" />
+                {currentModule?.title}
+              </DialogTitle>
+            </DialogHeader>
+            
+            {currentModule && !showResults ? (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <Progress value={(currentStep / 6) * 100} className="flex-1 mr-4" />
+                  <span className="text-sm text-gray-500">{currentStep + 1} of 6</span>
+                </div>
+                
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">
+                    Step {currentStep + 1}: {getExerciseTitle(currentModule.title, currentStep)}
+                  </h3>
+                  
+                  <p className="text-gray-700 leading-relaxed">
+                    {getExerciseQuestion(currentModule.title, currentStep)}
+                  </p>
+                  
+                  <RadioGroup value={selectedAnswer} onValueChange={setSelectedAnswer}>
+                    {getExerciseOptions(currentModule.title, currentStep).map((option) => (
+                      <div key={option.value} className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50">
+                        <RadioGroupItem value={option.value} id={option.value} />
+                        <Label htmlFor={option.value} className="flex-1 cursor-pointer">
+                          {option.label}
+                        </Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </div>
+                
+                <div className="flex justify-between">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
+                    disabled={currentStep === 0}
+                  >
+                    Previous
+                  </Button>
+                  
+                  <Button 
+                    onClick={handleNextQuestion}
+                    disabled={!selectedAnswer}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    Next
+                  </Button>
+                </div>
+              </div>
+            ) : showResults && currentModule ? (
+              <div className="text-center space-y-6">
+                <div className="flex justify-center">
+                  <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center">
+                    <CheckCircle className="h-12 w-12 text-green-600" />
+                  </div>
+                </div>
+                
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Training Complete!</h3>
+                  <p className="text-gray-600">
+                    Great job completing {currentModule.title}
+                  </p>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4 max-w-sm mx-auto">
+                  <div className="text-center p-4 bg-purple-50 rounded-lg">
+                    <Star className="h-8 w-8 text-purple-600 mx-auto mb-2" />
+                    <div className="text-2xl font-bold text-purple-600">+{currentModule.xpReward}</div>
+                    <div className="text-sm text-purple-600">XP Earned</div>
+                  </div>
+                  
+                  <div className="text-center p-4 bg-blue-50 rounded-lg">
+                    <Trophy className="h-8 w-8 text-blue-600 mx-auto mb-2" />
+                    <div className="text-2xl font-bold text-blue-600">100%</div>
+                    <div className="text-sm text-blue-600">Complete</div>
+                  </div>
+                </div>
+                
+                <Button 
+                  onClick={completeTraining}
+                  className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                >
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Collect Rewards
+                </Button>
+              </div>
+            ) : null}
+          </DialogContent>
+        </Dialog>
+
+        {/* Celebration Modal */}
+        <Dialog open={showCelebration} onOpenChange={setShowCelebration}>
+          <DialogContent className="max-w-md">
+            <div className="text-center space-y-6 py-6">
+              <div className="flex justify-center">
+                <div className="relative">
+                  <Crown className="h-16 w-16 text-yellow-500 animate-bounce" />
+                  <div className="absolute -top-2 -right-2">
+                    <Sparkles className="h-6 w-6 text-yellow-400 animate-pulse" />
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">Congratulations!</h3>
+                <p className="text-gray-600">
+                  You've successfully completed {currentModule?.title}
+                </p>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="flex items-center justify-center gap-2 text-lg font-semibold text-purple-600">
+                  <Star className="h-5 w-5" />
+                  +{currentModule?.xpReward} XP Earned
+                </div>
+                
+                <div className="text-sm text-gray-500">
+                  Keep learning to unlock more achievements!
+                </div>
+              </div>
+              
+              <Button 
+                onClick={() => setShowCelebration(false)}
+                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+              >
+                Continue Learning
+              </Button>
+            </div>
           </DialogContent>
         </Dialog>
       </div>

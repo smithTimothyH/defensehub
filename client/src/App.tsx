@@ -7,7 +7,7 @@ import Sidebar from "@/components/layout/sidebar";
 import Topbar from "@/components/layout/topbar";
 import Dashboard from "@/pages/dashboard";
 import PhishingSimulator from "@/pages/phishing-simulator";
-import TrainingScenarios from "@/pages/training-scenarios";
+
 import AIEducationHub from "@/pages/ai-education-hub";
 import LearningModule from "@/pages/learning-module";
 import Reports from "@/pages/reports";
@@ -22,7 +22,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Dashboard} />
       <Route path="/phishing-simulator" component={PhishingSimulator} />
-      <Route path="/training-scenarios" component={TrainingScenarios} />
+
       <Route path="/ai-education-hub" component={AIEducationHub} />
       <Route path="/learning-module" component={LearningModule} />
       <Route path="/reports" component={Reports} />

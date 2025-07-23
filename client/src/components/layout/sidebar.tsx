@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 const navigation = [
   { name: "Dashboard", href: "/", icon: BarChart3, category: "Main" },
   { name: "AI Education Hub", href: "/ai-education-hub", icon: Brain, category: "Main" },
-  { name: "Training Scenarios", href: "/training-scenarios", icon: GraduationCap, category: "Main" },
+
   { name: "Phishing Simulator", href: "/phishing-simulator", icon: Fish, category: "Main" },
   { name: "Reports", href: "/reports", icon: FileText, category: "Analytics" },
   { name: "Email Center", href: "/email-center", icon: Mail, category: "Analytics" },

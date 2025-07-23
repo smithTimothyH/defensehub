@@ -231,7 +231,7 @@ export default function TrainingScenarios() {
         "You notice an email has suspicious headers showing it originated from a different domain than claimed. What's your next step?",
         "After identifying a phishing email, what's the proper way to report it to your security team?"
       ],
-      "Social Engineering Awareness": [
+      "Social Engineering Defense": [
         "Someone calls claiming to be from IT support, asking for your password to 'fix your account'. How do you respond?",
         "A person in a delivery uniform asks you to hold the door open to the secure office area. What should you do?",
         "During casual conversation, a stranger asks about your company's software systems. How do you handle this?",
@@ -241,7 +241,7 @@ export default function TrainingScenarios() {
         "A USB drive labeled 'Executive Bonus Information' is left in the parking lot. What should you do?",
         "Someone follows closely behind you into a secure building without badging in. What's your appropriate action?"
       ],
-      "Incident Response Procedures": [
+      "Incident Response Protocol": [
         "You discover malware on your computer. What's the immediate first step you should take?",
         "How do you determine if a security event qualifies as a major incident requiring escalation?",
         "Who should be notified first when you discover a potential data breach?",
@@ -253,12 +253,36 @@ export default function TrainingScenarios() {
         "When should external parties (customers, partners) be notified of an incident?",
         "What legal requirements must be considered during incident response?"
       ],
-      "Password Security Best Practices": [
+      "Password Security Mastery": [
         "What makes a password strong and secure against common attacks?",
         "When should you enable multi-factor authentication on your accounts?",
         "How should you safely store and manage multiple complex passwords?",
         "What steps should you take if you forget your password and need to recover access?",
         "How do you properly secure shared accounts used by multiple team members?"
+      ],
+      "Network Security Basics": [
+        "You're connecting to public WiFi at a coffee shop. What's the safest approach?",
+        "Your company requires VPN usage. When should you always connect to the VPN?",
+        "You notice unusual network activity on your computer. What's your first action?",
+        "A suspicious website is requesting you to download a 'security certificate'. What should you do?",
+        "You receive a popup saying 'Your computer is infected! Call this number immediately.' How do you respond?",
+        "You find an open WiFi network named 'Free_WiFi_Secure'. Is it safe to connect?",
+        "Your browser shows a security warning about an untrusted certificate. What's the safest action?",
+        "You notice your internet connection is slower than usual and suspect a network issue. What should you check first?"
+      ],
+      "Data Protection & Privacy": [
+        "You're asked to share customer data with a third-party vendor. What must you verify first?",
+        "A colleague requests access to personal data for their project. What's the correct process?",
+        "You receive a GDPR data subject access request. What's your immediate priority?",
+        "You discover that customer data was accidentally sent to the wrong recipient. What's your first step?",
+        "You're traveling internationally with company data on your laptop. What precautions should you take?",
+        "A customer wants to delete all their personal data from your systems. What legal requirements apply?",
+        "You notice a data processing activity that doesn't have proper consent. What action is required?",
+        "Your team wants to use a new cloud service to store customer data. What must be evaluated first?",
+        "You're implementing a new feature that collects user location data. What principle must be followed?",
+        "You discover a vendor has been processing personal data without a proper agreement. What's required?",
+        "A data breach has occurred affecting EU residents. What's the notification timeframe?",
+        "You're designing a new system that processes children's data. What special requirements apply?"
       ]
     };
     return questions[moduleTitle]?.[step] || "What is the best security practice in this situation?";
@@ -270,7 +294,7 @@ export default function TrainingScenarios() {
       const correctAnswers = ["verify", "call", "expand", "report", "report", "forward"];
       return answer === correctAnswers[step];
     }
-    if (title === "Social Engineering Awareness") {
+    if (title === "Social Engineering Defense") {
       const correctAnswers = ["verify", "ask", "deflect", "verify", "verify", "verify", "turn"];
       return answer === correctAnswers[step];
     }
@@ -374,7 +398,7 @@ export default function TrainingScenarios() {
           { value: "screenshot", label: "Take a screenshot and email it to security" }
         ]
       ],
-      "Social Engineering Awareness": [
+      "Social Engineering Defense": [
         [
           { value: "provide", label: "Provide your password since they're from IT" },
           { value: "verify", label: "Ask for their employee ID and verify through proper channels" },
@@ -424,7 +448,7 @@ export default function TrainingScenarios() {
           { value: "follow", label: "Follow them to see where they go" }
         ]
       ],
-      "Incident Response Procedures": [
+      "Incident Response Protocol": [
         [
           { value: "scan", label: "Run a full antivirus scan immediately" },
           { value: "disconnect", label: "Disconnect from the network and report to IT" },
@@ -486,7 +510,7 @@ export default function TrainingScenarios() {
           { value: "both", label: "Both notification requirements and evidence preservation" }
         ]
       ],
-      "Password Security Best Practices": [
+      "Password Security Mastery": [
         [
           { value: "length", label: "Long passwords with a mix of characters, numbers, and symbols" },
           { value: "personal", label: "Personal information like birthdays and names" },
@@ -517,13 +541,41 @@ export default function TrainingScenarios() {
           { value: "rotate", label: "Regularly rotate the shared password" },
           { value: "post", label: "Post the password in a secure location" }
         ]
+      ],
+      "Network Security Basics": [
+        [
+          { value: "avoid", label: "Avoid public WiFi completely" },
+          { value: "vpn", label: "Use a VPN for all connections" },
+          { value: "trust", label: "Trust the coffee shop's WiFi since it's a business" },
+          { value: "password", label: "Only use password-protected networks" }
+        ],
+        [
+          { value: "always", label: "Always when accessing company resources" },
+          { value: "sensitive", label: "Only when handling sensitive data" },
+          { value: "travel", label: "Only when traveling" },
+          { value: "never", label: "VPN slows down the connection too much" }
+        ]
+      ],
+      "Data Protection & Privacy": [
+        [
+          { value: "contract", label: "Verify they have a proper data processing agreement" },
+          { value: "trust", label: "Trust them since they're a business partner" },
+          { value: "ask", label: "Ask your manager for approval" },
+          { value: "anonymize", label: "Remove names but share the data" }
+        ],
+        [
+          { value: "approve", label: "Check if they have proper authorization and business need" },
+          { value: "share", label: "Share it since they're a colleague" },
+          { value: "refuse", label: "Refuse all data access requests" },
+          { value: "copy", label: "Make them a copy for their own use" }
+        ]
       ]
     };
     return options[moduleTitle]?.[step] || [
-      { value: "a", label: "Option A" },
-      { value: "b", label: "Option B" },
-      { value: "c", label: "Option C" },
-      { value: "d", label: "Option D" }
+      { value: "safe", label: "Choose the safest security practice" },
+      { value: "verify", label: "Verify through official channels first" },
+      { value: "report", label: "Report to security team immediately" },
+      { value: "wait", label: "Wait and gather more information" }
     ];
   };
 

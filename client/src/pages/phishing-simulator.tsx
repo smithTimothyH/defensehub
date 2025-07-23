@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
@@ -328,7 +329,11 @@ export default function PhishingSimulator() {
       const departmentEmailsList = selectedDepartments.flatMap(dept => 
         departmentEmails[dept as keyof typeof departmentEmails] || []
       );
-      emails = departmentEmailsList.join("\n");
+      
+      // Add any additional manual emails
+      const additionalEmails = campaignEmails.trim() ? campaignEmails.split("\n").filter(email => email.trim()) : [];
+      const allEmails = [...departmentEmailsList, ...additionalEmails];
+      emails = allEmails.join("\n");
     }
 
     launchCampaignMutation.mutate({
@@ -650,64 +655,46 @@ export default function PhishingSimulator() {
 
             {/* Department Selection */}
             {targetingMode === "departments" && (
-              <div>
-                <Label className="text-base font-medium mb-3 block">Select Target Departments</Label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-80 overflow-y-auto">
-                  {departmentInfo.map((dept) => (
-                    <div
-                      key={dept.id}
-                      onClick={() => handleDepartmentToggle(dept.id)}
-                      className={`p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md ${
-                        selectedDepartments.includes(dept.id)
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          {dept.icon}
-                          <span className="font-medium">{dept.name}</span>
-                        </div>
-                        <Badge className={`text-xs ${getRiskLevelColor(dept.riskLevel)}`}>
-                          {dept.riskLevel}
-                        </Badge>
+              <div className="space-y-4">
+                <div>
+                  <Label className="text-base font-medium mb-2 block">Select Departments</Label>
+                  <div className="grid grid-cols-2 gap-3 max-h-48 overflow-y-auto border rounded-md p-3">
+                    {departmentInfo.map((dept) => (
+                      <div key={dept.id} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={dept.id}
+                          checked={selectedDepartments.includes(dept.id)}
+                          onCheckedChange={() => handleDepartmentToggle(dept.id)}
+                        />
+                        <label
+                          htmlFor={dept.id}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                        >
+                          {dept.name} ({dept.count})
+                        </label>
                       </div>
-                      
-                      <p className="text-sm text-gray-600 mb-1">{dept.description}</p>
-                      <p className="text-xs text-gray-500">{dept.count} email addresses</p>
-                      
-                      {selectedDepartments.includes(dept.id) && (
-                        <div className="mt-2">
-                          <div className="text-xs text-blue-600 font-medium">✓ Selected</div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
                 
+                <div>
+                  <Label htmlFor="additional-emails">Additional Email Addresses (optional)</Label>
+                  <Textarea
+                    id="additional-emails"
+                    value={campaignEmails}
+                    onChange={(e) => setCampaignEmails(e.target.value)}
+                    placeholder="Add extra email addresses (one per line)"
+                    rows={3}
+                  />
+                </div>
+
                 {selectedDepartments.length > 0 && (
-                  <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Trophy className="h-4 w-4 text-blue-600" />
-                      <span className="font-medium text-blue-800">Campaign Summary</span>
-                    </div>
-                    <p className="text-sm text-blue-700">
-                      Selected {selectedDepartments.length} department(s) with {
-                        selectedDepartments.reduce((total, dept) => 
-                          total + (departmentEmails[dept as keyof typeof departmentEmails]?.length || 0), 0
-                        )
-                      } total email addresses
-                    </p>
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {selectedDepartments.map((deptId) => {
-                        const dept = departmentInfo.find(d => d.id === deptId);
-                        return dept ? (
-                          <Badge key={deptId} variant="secondary" className="text-xs">
-                            {dept.name}
-                          </Badge>
-                        ) : null;
-                      })}
-                    </div>
+                  <div className="text-sm text-gray-600">
+                    Selected {selectedDepartments.length} department(s) with {
+                      selectedDepartments.reduce((total, dept) => 
+                        total + (departmentEmails[dept as keyof typeof departmentEmails]?.length || 0), 0
+                      )
+                    } email addresses
                   </div>
                 )}
               </div>

@@ -241,6 +241,76 @@ export default function TrainingScenarios() {
     return questions[moduleTitle]?.[step] || "What is the best security practice in this situation?";
   };
 
+  // Function to check if answer is correct
+  const isCorrectAnswer = (title: string, step: number, answer: string): boolean => {
+    if (title === "Email Security Fundamentals") {
+      const correctAnswers = ["verify", "call", "expand", "report", "report", "forward"];
+      return answer === correctAnswers[step];
+    }
+    if (title === "Social Engineering Awareness") {
+      const correctAnswers = ["verify", "ask", "deflect", "verify", "verify", "verify", "turn"];
+      return answer === correctAnswers[step];
+    }
+    // Default fallback
+    return false;
+  };
+
+  // Function to get explanation for each question
+  const getExplanation = (title: string, step: number): string => {
+    if (title === "Email Security Fundamentals") {
+      const explanations = [
+        "Always verify urgent requests through known channels. Attackers use urgency to bypass your judgment.",
+        "Never use links in suspicious emails. Contact your bank directly using official contact information.",
+        "Check where links actually lead before clicking. URL expanders reveal the real destination safely.",
+        "Never open unexpected attachments. Report suspicious emails to IT security for proper analysis.",
+        "Email headers can reveal spoofed addresses. Suspicious headers should be reported immediately.",
+        "Forward phishing emails with full headers to IT security so they can analyze threats and protect others."
+      ];
+      return explanations[step] || "Always think before you click and verify suspicious requests.";
+    }
+    if (title === "Social Engineering Awareness") {
+      const explanations = [
+        "Legitimate IT support will never ask for passwords. Always verify identity through official channels.",
+        "Tailgating is a common attack. Always verify identity before allowing access to secure areas.",
+        "Social engineers gather information through casual conversation. Keep business information confidential.",
+        "Verify all audit requests through official channels. Attackers often pose as auditors or consultants.",
+        "Never grant access based on badges alone. Verify identity and authorization for sensitive areas.",
+        "Create urgency is a manipulation tactic. Take time to verify all urgent requests properly.",
+        "Unknown USB drives can contain malware. Always turn them in to security without connecting them."
+      ];
+      return explanations[step] || "Always verify identity and authority before sharing information or granting access.";
+    }
+    return "Always be cautious with unexpected requests and verify through official channels.";
+  };
+
+  // Function to get examples for each question
+  const getExample = (title: string, step: number): string => {
+    if (title === "Email Security Fundamentals") {
+      const examples = [
+        "Example: Instead of responding immediately, call the CEO's office directly to confirm they sent the request.",
+        "Example: Call the number printed on your physical bank card, not any number provided in the email.",
+        "Example: Use unshorten.it or similar services to reveal that 'bit.ly/update' actually leads to 'malicious-site.com'.",
+        "Example: Email attachments claiming to be 'invoice.pdf' might actually be 'invoice.pdf.exe' - a malicious program.",
+        "Example: Check if the sender's domain 'amaozn.com' matches the real 'amazon.com' - notice the missing 'z'.",
+        "Example: Forward to security@company.com with subject 'PHISHING ALERT' so they can investigate and warn others."
+      ];
+      return examples[step] || "When in doubt, contact your IT security team for guidance.";
+    }
+    if (title === "Social Engineering Awareness") {
+      const examples = [
+        "Example: Say 'I'll need to verify your identity through our IT help desk first' and call IT directly.",
+        "Example: Ask 'Can I see your employee badge?' and verify the photo and access level match their request.",
+        "Example: When asked about company projects, say 'I can't discuss work details' and change the topic.",
+        "Example: Ask for their supervisor's contact information and verify the audit request through official channels.",
+        "Example: Say 'Let me escort you to security to verify your access level' rather than granting immediate access.",
+        "Example: Tell them 'I'll need to verify this through our IT department' and call IT using the official number.",
+        "Example: Report to security: 'Found USB drive in parking lot' without connecting it to any computer."
+      ];
+      return examples[step] || "Always verify through trusted channels before taking action.";
+    }
+    return "When in doubt, contact your security team for guidance.";
+  };
+
   const getExerciseOptions = (moduleTitle: string, step: number) => {
     const options: Record<string, Array<Array<{value: string, label: string}>>> = {
       "Email Security Fundamentals": [
@@ -728,12 +798,60 @@ export default function TrainingScenarios() {
                       
                       <RadioGroup value={selectedAnswer} onValueChange={setSelectedAnswer}>
                         {getExerciseOptions(currentExercise.title, exerciseStep).map((option: {value: string, label: string}, index: number) => (
-                          <div key={index} className="flex items-center space-x-2">
+                          <div key={index} className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50">
                             <RadioGroupItem value={option.value} id={option.value} />
-                            <Label htmlFor={option.value}>{option.label}</Label>
+                            <Label htmlFor={option.value} className="flex-1 cursor-pointer">{option.label}</Label>
                           </div>
                         ))}
                       </RadioGroup>
+
+                      {/* Immediate Feedback */}
+                      {selectedAnswer && (
+                        <div className={`mt-4 p-4 rounded-xl border-2 shadow-lg ${
+                          isCorrectAnswer(currentExercise.title, exerciseStep, selectedAnswer)
+                            ? 'bg-green-50 border-green-300' 
+                            : 'bg-red-50 border-red-300'
+                        }`}>
+                          <div className="flex items-center gap-2 mb-2">
+                            {isCorrectAnswer(currentExercise.title, exerciseStep, selectedAnswer) ? (
+                              <CheckCircle className="h-5 w-5 text-green-600" />
+                            ) : (
+                              <Target className="h-5 w-5 text-red-600" />
+                            )}
+                            <span className={`font-medium ${
+                              isCorrectAnswer(currentExercise.title, exerciseStep, selectedAnswer)
+                                ? 'text-green-800' 
+                                : 'text-red-800'
+                            }`}>
+                              {isCorrectAnswer(currentExercise.title, exerciseStep, selectedAnswer) ? 'Correct!' : 'Not quite right'}
+                            </span>
+                          </div>
+                          <p className={`text-sm mb-3 ${
+                            isCorrectAnswer(currentExercise.title, exerciseStep, selectedAnswer)
+                              ? 'text-green-700' 
+                              : 'text-red-700'
+                          }`}>
+                            {getExplanation(currentExercise.title, exerciseStep)}
+                          </p>
+                          <div className={`text-xs p-3 rounded-lg ${
+                            isCorrectAnswer(currentExercise.title, exerciseStep, selectedAnswer)
+                              ? 'bg-green-100 border border-green-200' 
+                              : 'bg-red-100 border border-red-200'
+                          }`}>
+                            <div className="flex items-center gap-2 mb-1">
+                              <Brain className="h-3 w-3" />
+                              <span className="font-medium">Example:</span>
+                            </div>
+                            <p className={`${
+                              isCorrectAnswer(currentExercise.title, exerciseStep, selectedAnswer)
+                                ? 'text-green-800' 
+                                : 'text-red-800'
+                            }`}>
+                              {getExample(currentExercise.title, exerciseStep)}
+                            </p>
+                          </div>
+                        </div>
+                      )}
                     </>
                   )}
                 </div>
@@ -777,110 +895,86 @@ export default function TrainingScenarios() {
               </div>
             </div>
 
-            {/* Enhanced Gamified Results */}
+            {/* Compact Gamified Results */}
             {showResults && (
               <Card className="overflow-hidden">
-                <CardContent className="p-8 text-center relative">
-                  {/* Confetti Background Effect */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-purple-50 via-pink-50 to-yellow-50 opacity-50"></div>
+                <CardContent className="p-4 text-center relative">
+                  {/* Confetti Background */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-50 via-pink-50 to-yellow-50 opacity-30"></div>
                   
                   <div className="relative z-10">
-                    <div className="mb-6">
-                      {/* Animated Trophy */}
-                      <div className="mx-auto w-20 h-20 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center mb-4 animate-bounce shadow-xl">
-                        <Crown className="h-10 w-10 text-white" />
-                      </div>
-                      
-                      {/* Achievement Celebration */}
-                      <div className="flex justify-center items-center gap-2 mb-4">
-                        <Sparkles className="h-6 w-6 text-pink-500 animate-pulse" />
-                        <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                          MISSION ACCOMPLISHED!
-                        </h2>
-                        <Sparkles className="h-6 w-6 text-pink-500 animate-pulse" />
-                      </div>
-                      
-                      <p className="text-lg text-gray-700 mb-2">You've mastered this training module!</p>
-                      
-                      {/* Score-based message */}
-                      <div className="mb-4">
-                        {exerciseScore >= 90 && (
-                          <div className="bg-gradient-to-r from-green-100 to-emerald-100 border border-green-300 rounded-lg p-3">
-                            <div className="flex items-center justify-center gap-2 text-green-800">
-                              <Star className="h-5 w-5 text-yellow-500" />
-                              <span className="font-bold">EXCELLENT! You're a cybersecurity champion!</span>
-                              <Star className="h-5 w-5 text-yellow-500" />
-                            </div>
+                    {/* Animated Trophy */}
+                    <div className="mx-auto w-16 h-16 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center mb-3 animate-bounce shadow-lg">
+                      <Crown className="h-8 w-8 text-white" />
+                    </div>
+                    
+                    {/* Achievement Celebration */}
+                    <div className="flex justify-center items-center gap-2 mb-3">
+                      <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                        MISSION ACCOMPLISHED!
+                      </h2>
+                    </div>
+                    
+                    {/* Score-based message */}
+                    <div className="mb-4">
+                      {exerciseScore >= 90 && (
+                        <div className="bg-gradient-to-r from-green-100 to-emerald-100 border border-green-300 rounded-lg p-2">
+                          <div className="flex items-center justify-center gap-2 text-green-800 text-sm">
+                            <Star className="h-4 w-4 text-yellow-500" />
+                            <span className="font-bold">EXCELLENT! You're a cybersecurity champion!</span>
                           </div>
-                        )}
-                        {exerciseScore >= 70 && exerciseScore < 90 && (
-                          <div className="bg-gradient-to-r from-blue-100 to-cyan-100 border border-blue-300 rounded-lg p-3">
-                            <div className="flex items-center justify-center gap-2 text-blue-800">
-                              <Target className="h-5 w-5 text-blue-600" />
-                              <span className="font-bold">GREAT JOB! You've got solid security skills!</span>
-                            </div>
+                        </div>
+                      )}
+                      {exerciseScore >= 70 && exerciseScore < 90 && (
+                        <div className="bg-gradient-to-r from-blue-100 to-cyan-100 border border-blue-300 rounded-lg p-2">
+                          <div className="flex items-center justify-center gap-2 text-blue-800 text-sm">
+                            <Target className="h-4 w-4 text-blue-600" />
+                            <span className="font-bold">GREAT JOB! You've got solid security skills!</span>
                           </div>
-                        )}
-                        {exerciseScore < 70 && (
-                          <div className="bg-gradient-to-r from-orange-100 to-yellow-100 border border-orange-300 rounded-lg p-3">
-                            <div className="flex items-center justify-center gap-2 text-orange-800">
-                              <Brain className="h-5 w-5 text-orange-600" />
-                              <span className="font-bold">GOOD START! Keep practicing to strengthen your skills!</span>
-                            </div>
+                        </div>
+                      )}
+                      {exerciseScore < 70 && (
+                        <div className="bg-gradient-to-r from-orange-100 to-yellow-100 border border-orange-300 rounded-lg p-2">
+                          <div className="flex items-center justify-center gap-2 text-orange-800 text-sm">
+                            <Brain className="h-4 w-4 text-orange-600" />
+                            <span className="font-bold">GOOD START! Keep practicing!</span>
                           </div>
-                        )}
-                      </div>
+                        </div>
+                      )}
                     </div>
 
-                    {/* Gamified Stats */}
-                    <div className="grid grid-cols-3 gap-6 mb-8">
-                      <div className="bg-gradient-to-br from-purple-100 to-purple-200 rounded-lg p-4 border-2 border-purple-300">
-                        <div className="text-4xl font-bold text-purple-700">{exerciseScore}%</div>
-                        <div className="text-sm text-purple-600 font-medium">Security Score</div>
-                        <div className="mt-1">
-                          {exerciseScore >= 90 && <Crown className="h-5 w-5 text-yellow-500 mx-auto" />}
-                          {exerciseScore >= 70 && exerciseScore < 90 && <Star className="h-5 w-5 text-blue-500 mx-auto" />}
-                          {exerciseScore < 70 && <Target className="h-5 w-5 text-orange-500 mx-auto" />}
-                        </div>
+                    {/* Compact Stats */}
+                    <div className="grid grid-cols-3 gap-3 mb-4">
+                      <div className="bg-gradient-to-br from-purple-100 to-purple-200 rounded-lg p-3 border border-purple-300">
+                        <div className="text-2xl font-bold text-purple-700">{exerciseScore}%</div>
+                        <div className="text-xs text-purple-600 font-medium">Score</div>
                       </div>
                       
-                      <div className="bg-gradient-to-br from-green-100 to-emerald-200 rounded-lg p-4 border-2 border-green-300">
-                        <div className="flex items-center justify-center gap-1 mb-1">
-                          <Zap className="h-6 w-6 text-yellow-500" />
-                          <div className="text-4xl font-bold text-green-700">125</div>
+                      <div className="bg-gradient-to-br from-green-100 to-emerald-200 rounded-lg p-3 border border-green-300">
+                        <div className="flex items-center justify-center gap-1">
+                          <Zap className="h-4 w-4 text-yellow-500" />
+                          <div className="text-2xl font-bold text-green-700">125</div>
                         </div>
-                        <div className="text-sm text-green-600 font-medium">XP Gained</div>
-                        <div className="text-xs text-green-600 mt-1">+{Math.round(125 * (exerciseScore/100))} bonus XP</div>
+                        <div className="text-xs text-green-600 font-medium">XP</div>
                       </div>
                       
-                      <div className="bg-gradient-to-br from-blue-100 to-cyan-200 rounded-lg p-4 border-2 border-blue-300">
-                        <div className="flex items-center justify-center gap-1 mb-1">
-                          <Award className="h-6 w-6 text-pink-500" />
-                          <div className="text-4xl font-bold text-blue-700">100</div>
-                        </div>
-                        <div className="text-sm text-blue-600 font-medium">Completion</div>
-                        <div className="text-xs text-blue-600 mt-1">All challenges!</div>
+                      <div className="bg-gradient-to-br from-blue-100 to-cyan-200 rounded-lg p-3 border border-blue-300">
+                        <div className="text-2xl font-bold text-blue-700">100%</div>
+                        <div className="text-xs text-blue-600 font-medium">Complete</div>
                       </div>
                     </div>
 
                     {/* Achievement Badges */}
-                    <div className="mb-8">
-                      <h3 className="text-lg font-bold text-gray-800 mb-4">🏆 Achievements Unlocked</h3>
-                      <div className="flex justify-center gap-4 flex-wrap">
-                        <div className="bg-gradient-to-br from-yellow-200 to-yellow-300 rounded-lg p-3 border-2 border-yellow-400">
-                          <Medal className="h-6 w-6 text-yellow-700 mx-auto mb-1" />
+                    <div className="mb-4">
+                      <div className="flex justify-center gap-2 flex-wrap">
+                        <div className="bg-gradient-to-br from-yellow-200 to-yellow-300 rounded-lg p-2 border border-yellow-400">
+                          <Medal className="h-4 w-4 text-yellow-700 mx-auto mb-1" />
                           <div className="text-xs font-medium text-yellow-800">Training Master</div>
                         </div>
                         {exerciseScore >= 80 && (
-                          <div className="bg-gradient-to-br from-purple-200 to-purple-300 rounded-lg p-3 border-2 border-purple-400">
-                            <Star className="h-6 w-6 text-purple-700 mx-auto mb-1" />
+                          <div className="bg-gradient-to-br from-purple-200 to-purple-300 rounded-lg p-2 border border-purple-400">
+                            <Star className="h-4 w-4 text-purple-700 mx-auto mb-1" />
                             <div className="text-xs font-medium text-purple-800">High Achiever</div>
-                          </div>
-                        )}
-                        {exerciseScore === 100 && (
-                          <div className="bg-gradient-to-br from-pink-200 to-pink-300 rounded-lg p-3 border-2 border-pink-400">
-                            <Crown className="h-6 w-6 text-pink-700 mx-auto mb-1" />
-                            <div className="text-xs font-medium text-pink-800">Perfect Score</div>
                           </div>
                         )}
                       </div>
@@ -894,7 +988,7 @@ export default function TrainingScenarios() {
                         setShowExerciseModal(false);
                         setShowResults(false);
                       }}
-                      className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-3 text-lg font-medium"
+                      className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-2"
                     >
                       Continue Learning
                     </Button>

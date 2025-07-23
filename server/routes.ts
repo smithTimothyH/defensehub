@@ -6,6 +6,7 @@ import {
   generatePhishingScenario, 
   generateCoachingFeedback, 
   generateCrisisScenario,
+  generateAdaptiveCoaching,
   type PhishingScenarioConfig 
 } from "./services/openai";
 import { emailService } from "./services/email";
@@ -192,6 +193,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(scenario);
     } catch (error) {
       res.status(500).json({ message: "Failed to generate crisis scenario" });
+    }
+  });
+
+  // Adaptive AI Coach endpoint
+  app.post("/api/ai-coach/adaptive", async (req, res) => {
+    try {
+      const { userBehavior, currentTopic, recentPerformance } = req.body;
+      
+      if (!userBehavior) {
+        return res.status(400).json({ message: "User behavior data is required" });
+      }
+
+      const coaching = await generateAdaptiveCoaching(userBehavior, currentTopic || "General Security", recentPerformance || []);
+      res.json(coaching);
+    } catch (error) {
+      console.error('Adaptive coaching error:', error);
+      res.status(500).json({ message: "Failed to generate adaptive coaching" });
+    }
+  });
+
+  // Enhanced coaching feedback endpoint
+  app.post("/api/ai-coach/feedback", async (req, res) => {
+    try {
+      const { userAction, scenarioDetails, wasCorrectResponse } = req.body;
+      
+      if (!userAction) {
+        return res.status(400).json({ message: "User action is required" });
+      }
+
+      const feedback = await generateCoachingFeedback(userAction, scenarioDetails || {}, wasCorrectResponse || false);
+      res.json(feedback);
+    } catch (error) {
+      console.error('Coaching feedback error:', error);
+      res.status(500).json({ message: "Failed to generate coaching feedback" });
     }
   });
 

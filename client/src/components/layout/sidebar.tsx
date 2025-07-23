@@ -1,12 +1,12 @@
 import { Link, useLocation } from "wouter";
-import { Shield, BarChart3, Fish, GraduationCap, AlertTriangle, FileText, Users, Settings, Mail } from "lucide-react";
+import { Shield, BarChart3, Fish, GraduationCap, Brain, FileText, Users, Settings, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: BarChart3, category: "Main" },
-  { name: "Phishing Simulator", href: "/phishing-simulator", icon: Fish, category: "Main" },
+  { name: "AI Education Hub", href: "/ai-education-hub", icon: Brain, category: "Main" },
   { name: "Training Scenarios", href: "/training-scenarios", icon: GraduationCap, category: "Main" },
-  { name: "Crisis Simulation", href: "/crisis-simulation", icon: AlertTriangle, category: "Main" },
+  { name: "Phishing Simulator", href: "/phishing-simulator", icon: Fish, category: "Main" },
   { name: "Reports", href: "/reports", icon: FileText, category: "Analytics" },
   { name: "Email Center", href: "/email-center", icon: Mail, category: "Analytics" },
   { name: "User Management", href: "/users", icon: Users, category: "System" },
@@ -27,7 +27,7 @@ export default function Sidebar() {
           </div>
           <div>
             <h1 className="text-xl font-bold text-gray-900">DefenseHub</h1>
-            <p className="text-sm text-gray-500">Security Training Platform</p>
+            <p className="text-sm text-gray-500">AI-Powered Education Hub</p>
           </div>
         </div>
       </div>

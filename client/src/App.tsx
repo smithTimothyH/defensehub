@@ -8,7 +8,7 @@ import Topbar from "@/components/layout/topbar";
 import Dashboard from "@/pages/dashboard";
 import PhishingSimulator from "@/pages/phishing-simulator";
 import TrainingScenarios from "@/pages/training-scenarios";
-import CrisisSimulation from "@/pages/crisis-simulation";
+import AIEducationHub from "@/pages/ai-education-hub";
 import Reports from "@/pages/reports";
 
 
@@ -22,7 +22,7 @@ function Router() {
       <Route path="/" component={Dashboard} />
       <Route path="/phishing-simulator" component={PhishingSimulator} />
       <Route path="/training-scenarios" component={TrainingScenarios} />
-      <Route path="/crisis-simulation" component={CrisisSimulation} />
+      <Route path="/ai-education-hub" component={AIEducationHub} />
       <Route path="/reports" component={Reports} />
       <Route path="/email-center" component={EmailCenter} />
       <Route path="/phishing-caught" component={PhishingCaught} />

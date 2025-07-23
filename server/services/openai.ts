@@ -162,24 +162,146 @@ Respond in JSON format with the following structure:
   }
 }
 
+export interface UserBehaviorData {
+  completedModules: string[];
+  strengths: string[];
+  weaknesses: string[];
+  learningStyle: "visual" | "interactive" | "reading" | "hands-on";
+  engagementLevel: "low" | "medium" | "high";
+  difficultyPreference: "basic" | "intermediate" | "advanced";
+  totalXP: number;
+  streak: number;
+}
+
+export interface AdaptiveCoachingResponse {
+  personalizedMessage: string;
+  recommendedActions: string[];
+  nextLearningPath: string[];
+  motivationalContent: string;
+  adaptedDifficulty: string;
+  gamificationElements: {
+    badgesEarned: string[];
+    streakBonus: number;
+    nextMilestone: string;
+  };
+}
+
+export async function generateAdaptiveCoaching(
+  userBehavior: UserBehaviorData,
+  currentTopic: string,
+  recentPerformance: any[]
+): Promise<AdaptiveCoachingResponse> {
+  const prompt = `You are an AI cybersecurity education coach. Analyze the user's behavior and provide personalized, adaptive coaching.
+
+User Profile:
+- Completed modules: ${userBehavior.completedModules.join(", ")}
+- Strengths: ${userBehavior.strengths.join(", ")}
+- Areas for improvement: ${userBehavior.weaknesses.join(", ")}
+- Learning style: ${userBehavior.learningStyle}
+- Engagement level: ${userBehavior.engagementLevel}
+- Current XP: ${userBehavior.totalXP}
+- Learning streak: ${userBehavior.streak} days
+
+Current topic: ${currentTopic}
+Recent performance: ${JSON.stringify(recentPerformance)}
+
+Provide adaptive coaching that:
+1. Personalizes the message based on their learning style and engagement
+2. Suggests specific next actions tailored to their strengths/weaknesses
+3. Recommends a learning path that builds on their progress
+4. Includes motivational content appropriate to their streak and XP
+5. Adjusts difficulty based on their performance
+6. Adds gamification elements (badges, milestones, achievements)
+
+Be encouraging, specific, and educational. Make learning fun and engaging!
+
+Respond in JSON format:
+{
+  "personalizedMessage": "Personalized coaching message based on their profile",
+  "recommendedActions": ["Specific action 1", "Specific action 2", "Specific action 3"],
+  "nextLearningPath": ["Next module 1", "Next module 2", "Next module 3"],
+  "motivationalContent": "Encouraging message with their achievements",
+  "adaptedDifficulty": "basic/intermediate/advanced based on performance",
+  "gamificationElements": {
+    "badgesEarned": ["Badge 1", "Badge 2"],
+    "streakBonus": 25,
+    "nextMilestone": "Description of next achievement"
+  }
+}`;
+
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: "You are an expert AI education coach specializing in cybersecurity training. You personalize learning experiences, adapt difficulty levels, and keep users engaged through gamification and positive reinforcement."
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.7,
+    });
+
+    const result = JSON.parse(response.choices[0].message.content || "{}");
+    return {
+      personalizedMessage: result.personalizedMessage || "Great work on your cybersecurity learning journey!",
+      recommendedActions: result.recommendedActions || ["Continue with your next training module", "Practice identifying phishing emails", "Review security best practices"],
+      nextLearningPath: result.nextLearningPath || ["Email Security", "Password Management", "Social Engineering"],
+      motivationalContent: result.motivationalContent || "You're making excellent progress! Keep up the great work!",
+      adaptedDifficulty: result.adaptedDifficulty || "intermediate",
+      gamificationElements: result.gamificationElements || {
+        badgesEarned: ["Security Awareness"],
+        streakBonus: 0,
+        nextMilestone: "Complete 5 training modules to earn the Cyber Guardian badge"
+      }
+    };
+  } catch (error) {
+    console.error("Error generating adaptive coaching:", error);
+    // Fallback with personalized content based on user data
+    return {
+      personalizedMessage: `Hi there! I see you've completed ${userBehavior.completedModules.length} modules and earned ${userBehavior.totalXP} XP. Let's continue building your cybersecurity skills!`,
+      recommendedActions: [
+        "Complete your next training module",
+        "Practice with interactive scenarios",
+        "Review your learning achievements"
+      ],
+      nextLearningPath: ["Email Security", "Password Management", "Social Engineering"],
+      motivationalContent: `🎉 You're on a ${userBehavior.streak}-day learning streak! Amazing dedication to cybersecurity!`,
+      adaptedDifficulty: userBehavior.difficultyPreference,
+      gamificationElements: {
+        badgesEarned: ["Learner"],
+        streakBonus: userBehavior.streak * 5,
+        nextMilestone: "Reach 500 XP to unlock advanced scenarios"
+      }
+    };
+  }
+}
+
 export async function generateCoachingFeedback(
   userAction: string,
   scenarioDetails: any,
   wasCorrectResponse: boolean
 ): Promise<CoachingFeedback> {
-  const prompt = `Provide personalized coaching feedback for a user who ${userAction} in response to a phishing simulation.
+  const prompt = `Provide personalized coaching feedback for a user who ${userAction} in response to a cybersecurity training scenario.
 
 Scenario context: ${JSON.stringify(scenarioDetails)}
 User's response was ${wasCorrectResponse ? "correct" : "incorrect"}.
 
-Provide constructive feedback that:
-1. Explains what the user did well or what they missed
-2. Offers specific recommendations for improvement
-3. Provides actionable security tips for the future
+Provide constructive, encouraging feedback that:
+1. Celebrates what the user did well or gently explains what they missed
+2. Offers specific, actionable recommendations
+3. Provides practical security tips they can use immediately
+4. Keeps the tone positive and educational
+
+Make it fun and engaging - this is educational content, not a test!
 
 Respond in JSON format:
 {
-  "feedback": "Personalized feedback message",
+  "feedback": "Encouraging, educational feedback message",
   "recommendations": ["Specific improvement recommendations"],
   "securityTips": ["Practical security tips"]
 }`;
@@ -190,7 +312,7 @@ Respond in JSON format:
       messages: [
         {
           role: "system",
-          content: "You are an expert cybersecurity coach providing supportive, educational feedback to help users improve their security awareness."
+          content: "You are a friendly, encouraging cybersecurity education coach. Your goal is to help users learn and improve their security awareness in a positive, supportive way. Make learning fun and engaging!"
         },
         {
           role: "user",
@@ -203,13 +325,23 @@ Respond in JSON format:
 
     const result = JSON.parse(response.choices[0].message.content || "{}");
     return {
-      feedback: result.feedback || "Thank you for participating in the security training.",
-      recommendations: result.recommendations || ["Continue practicing security awareness"],
-      securityTips: result.securityTips || ["Always verify sender identity"],
+      feedback: result.feedback || "Thank you for participating in the security training! Every step helps you become more security-aware.",
+      recommendations: result.recommendations || ["Continue practicing security awareness", "Ask questions when you're unsure", "Apply these skills in your daily work"],
+      securityTips: result.securityTips || ["Always verify sender identity", "When in doubt, ask IT", "Trust your instincts about suspicious content"],
     };
   } catch (error) {
     console.error("Error generating coaching feedback:", error);
-    throw new Error("Failed to generate coaching feedback");
+    
+    // Fallback with encouraging content
+    const encouragingFeedback = wasCorrectResponse 
+      ? "Excellent work! You correctly identified the security issue. This shows great awareness!"
+      : "Great learning opportunity! This scenario helps you recognize these patterns in the future.";
+      
+    return {
+      feedback: encouragingFeedback,
+      recommendations: ["Keep practicing with different scenarios", "Review the security indicators", "Apply this knowledge in your daily work"],
+      securityTips: ["Look for suspicious URLs", "Verify unexpected requests", "When in doubt, ask for help"]
+    };
   }
 }
 

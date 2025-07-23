@@ -54,7 +54,7 @@ export default function LearningModule() {
   const [showResults, setShowResults] = useState(false);
   const [score, setScore] = useState(0);
   const [progress, setProgress] = useState(0);
-  const [showCongrats, setShowCongrats] = useState(false);
+
   const { toast } = useToast();
   
   // Debug logging
@@ -207,14 +207,11 @@ export default function LearningModule() {
     setProgress(100);
     setShowResults(true);
     
-    // Show congratulations after a brief delay
-    setTimeout(() => {
-      setShowCongrats(true);
-      toast({
-        title: "Module Complete!",
-        description: `You earned ${moduleData.xpReward} XP! Score: ${finalScore}%`,
-      });
-    }, 1500);
+    // Show toast notification
+    toast({
+      title: "Module Complete!",
+      description: `You earned ${moduleData.xpReward} XP! Score: ${finalScore}%`,
+    });
   };
 
   const returnToHub = () => {
@@ -501,10 +498,10 @@ export default function LearningModule() {
                   </RadioGroup>
 
                   {selectedAnswers[currentQuestion.id] !== undefined && (
-                    <div className={`mt-4 p-4 rounded-lg border ${
+                    <div className={`mt-6 p-6 rounded-xl border-2 shadow-lg ${
                       selectedAnswers[currentQuestion.id] === currentQuestion.correctAnswer 
-                        ? 'bg-green-50 border-green-200' 
-                        : 'bg-red-50 border-red-200'
+                        ? 'bg-green-50 border-green-300' 
+                        : 'bg-red-50 border-red-300'
                     }`}>
                       <div className="flex items-center gap-2 mb-2">
                         {selectedAnswers[currentQuestion.id] === currentQuestion.correctAnswer ? (
@@ -563,7 +560,8 @@ export default function LearningModule() {
                   disabled={!isContentPhase && !!currentQuestion && selectedAnswers[currentQuestion.id] === undefined}
                   className="bg-purple-600 hover:bg-purple-700"
                 >
-                  {currentStep === totalSteps - 1 ? 'Complete Module' : 'Next'}
+                  {currentStep === totalSteps - 1 ? 'Complete Module' : 
+                   (!isContentPhase && !!currentQuestion && selectedAnswers[currentQuestion.id] !== undefined) ? 'Next Question' : 'Next'}
                   <ChevronRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>
@@ -609,29 +607,7 @@ export default function LearningModule() {
           </CardContent>
         </Card>
 
-        {/* Congratulations Dialog */}
-        <Dialog open={showCongrats} onOpenChange={setShowCongrats}>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle className="text-center">
-                <div className="mx-auto w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                  <Award className="h-6 w-6 text-green-600" />
-                </div>
-                Congratulations!
-              </DialogTitle>
-            </DialogHeader>
-            <div className="text-center space-y-4">
-              <p>You've successfully completed the <strong>{moduleData.title}</strong> module!</p>
-              <div className="bg-purple-50 p-4 rounded-lg">
-                <div className="text-2xl font-bold text-purple-600">{moduleData.xpReward} XP</div>
-                <div className="text-sm text-purple-700">Experience Points Earned</div>
-              </div>
-              <Button onClick={() => setShowCongrats(false)} className="w-full">
-                Continue Learning
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+
       </div>
     </div>
   );

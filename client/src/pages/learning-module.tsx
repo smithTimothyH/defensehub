@@ -56,6 +56,15 @@ export default function LearningModule() {
   const [progress, setProgress] = useState(0);
   const [showCongrats, setShowCongrats] = useState(false);
   const { toast } = useToast();
+  
+  // Debug logging
+  useEffect(() => {
+    console.log('Selected answers updated:', selectedAnswers);
+  }, [selectedAnswers]);
+  
+  useEffect(() => {
+    console.log('Show results:', showResults, 'Score:', score);
+  }, [showResults, score]);
 
   // Get module ID from URL parameters
   const urlParams = new URLSearchParams(window.location.search);
@@ -162,10 +171,15 @@ export default function LearningModule() {
   const totalSteps = moduleData.learningContent.length + moduleData.questions.length;
 
   const handleAnswer = (questionId: number, answerIndex: number) => {
-    setSelectedAnswers(prev => ({
-      ...prev,
-      [questionId]: answerIndex
-    }));
+    console.log('Answer selected:', questionId, answerIndex);
+    setSelectedAnswers(prev => {
+      const newAnswers = {
+        ...prev,
+        [questionId]: answerIndex
+      };
+      console.log('Updated answers:', newAnswers);
+      return newAnswers;
+    });
   };
 
   const calculateScore = () => {
@@ -527,7 +541,7 @@ export default function LearningModule() {
                             ? 'text-green-800' 
                             : 'text-red-800'
                         }`}>
-                          {currentQuestion.example}
+                          {currentQuestion.example || 'No example provided'}
                         </p>
                       </div>
                     </div>

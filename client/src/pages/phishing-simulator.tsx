@@ -22,7 +22,6 @@ export default function PhishingSimulator() {
   const [showCoachDialog, setShowCoachDialog] = useState(false);
   const [campaignName, setCampaignName] = useState("");
   const [campaignEmails, setCampaignEmails] = useState("");
-  const [targetingMode, setTargetingMode] = useState<"individual" | "departments">("individual");
   const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
   
   // Calculate real skill level from simulation data
@@ -239,7 +238,6 @@ export default function PhishingSimulator() {
       setShowLaunchDialog(false);
       setCampaignName("");
       setCampaignEmails("");
-      setTargetingMode("individual");
       setSelectedDepartments([]);
       queryClient.invalidateQueries({ queryKey: ["/api/simulations"] });
     },
@@ -280,7 +278,6 @@ export default function PhishingSimulator() {
   const handleLaunchCampaign = (simulation: any) => {
     setSelectedCampaign(simulation);
     setCampaignName(simulation.name + " - " + new Date().toLocaleDateString());
-    setTargetingMode("individual");
     setSelectedDepartments([]);
     setShowLaunchDialog(true);
   };
@@ -303,45 +300,31 @@ export default function PhishingSimulator() {
   };
 
   const handleLaunchSubmit = () => {
-    let emails = "";
+    // Combine emails from selected departments
+    const departmentEmailsList = selectedDepartments.flatMap(dept => 
+      departmentEmails[dept as keyof typeof departmentEmails] || []
+    );
     
-    if (targetingMode === "individual") {
-      if (!campaignEmails.trim()) {
-        toast({
-          title: "Missing Email Addresses",
-          description: "Please enter email addresses to send the campaign to.",
-          variant: "destructive",
-        });
-        return;
-      }
-      emails = campaignEmails;
-    } else {
-      if (selectedDepartments.length === 0) {
-        toast({
-          title: "No Departments Selected",
-          description: "Please select at least one department to target.",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      // Combine all emails from selected departments
-      const departmentEmailsList = selectedDepartments.flatMap(dept => 
-        departmentEmails[dept as keyof typeof departmentEmails] || []
-      );
-      
-      // Add any additional manual emails
-      const additionalEmails = campaignEmails.trim() ? campaignEmails.split("\n").filter(email => email.trim()) : [];
-      const allEmails = [...departmentEmailsList, ...additionalEmails];
-      emails = allEmails.join("\n");
+    // Add any additional manual emails
+    const additionalEmails = campaignEmails.trim() ? campaignEmails.split("\n").filter(email => email.trim()) : [];
+    const allEmails = [...departmentEmailsList, ...additionalEmails];
+    
+    if (allEmails.length === 0) {
+      toast({
+        title: "No Email Addresses",
+        description: "Please select departments or enter email addresses to send the campaign to.",
+        variant: "destructive",
+      });
+      return;
     }
+    
+    const emails = allEmails.join("\n");
 
     launchCampaignMutation.mutate({
       campaignName,
       emails,
       simulationId: selectedCampaign.id,
-      targetingMode,
-      departments: targetingMode === "departments" ? selectedDepartments : undefined
+      departments: selectedDepartments.length > 0 ? selectedDepartments : undefined
     });
   };
 
@@ -612,93 +595,60 @@ export default function PhishingSimulator() {
               />
             </div>
             
-            {/* Targeting Mode Selection */}
-            <div>
-              <Label className="text-base font-medium">Targeting Method</Label>
-              <div className="flex gap-4 mt-2">
-                <label className="flex items-center space-x-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    value="individual"
-                    checked={targetingMode === "individual"}
-                    onChange={(e) => setTargetingMode(e.target.value as "individual" | "departments")}
-                    className="text-blue-600"
-                  />
-                  <span>Individual Email Addresses</span>
-                </label>
-                <label className="flex items-center space-x-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    value="departments"
-                    checked={targetingMode === "departments"}
-                    onChange={(e) => setTargetingMode(e.target.value as "individual" | "departments")}
-                    className="text-blue-600"
-                  />
-                  <span>Target Departments</span>
-                </label>
-              </div>
-            </div>
-
-            {/* Individual Email Input */}
-            {targetingMode === "individual" && (
+            {/* Department Selection */}
+            <div className="space-y-4">
               <div>
-                <Label htmlFor="campaign-emails">Target Email Addresses</Label>
+                <Label className="text-base font-medium mb-2 block">Select Departments</Label>
+                <div className="grid grid-cols-2 gap-3 max-h-48 overflow-y-auto border rounded-md p-3">
+                  {departmentInfo.map((dept) => (
+                    <div key={dept.id} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={dept.id}
+                        checked={selectedDepartments.includes(dept.id)}
+                        onCheckedChange={() => handleDepartmentToggle(dept.id)}
+                      />
+                      <label
+                        htmlFor={dept.id}
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                      >
+                        {dept.name} ({dept.count})
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <div>
+                <Label htmlFor="additional-emails">Additional Email Addresses (optional)</Label>
                 <Textarea
-                  id="campaign-emails"
+                  id="additional-emails"
                   value={campaignEmails}
                   onChange={(e) => setCampaignEmails(e.target.value)}
-                  placeholder="Enter email addresses (one per line)"
-                  rows={4}
+                  placeholder="Add extra email addresses (one per line)"
+                  rows={3}
                 />
               </div>
-            )}
 
-            {/* Department Selection */}
-            {targetingMode === "departments" && (
-              <div className="space-y-4">
-                <div>
-                  <Label className="text-base font-medium mb-2 block">Select Departments</Label>
-                  <div className="grid grid-cols-2 gap-3 max-h-48 overflow-y-auto border rounded-md p-3">
-                    {departmentInfo.map((dept) => (
-                      <div key={dept.id} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={dept.id}
-                          checked={selectedDepartments.includes(dept.id)}
-                          onCheckedChange={() => handleDepartmentToggle(dept.id)}
-                        />
-                        <label
-                          htmlFor={dept.id}
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                        >
-                          {dept.name} ({dept.count})
-                        </label>
-                      </div>
-                    ))}
-                  </div>
+              {(selectedDepartments.length > 0 || campaignEmails.trim()) && (
+                <div className="text-sm text-gray-600">
+                  {selectedDepartments.length > 0 && (
+                    <span>
+                      Selected {selectedDepartments.length} department(s) with {
+                        selectedDepartments.reduce((total, dept) => 
+                          total + (departmentEmails[dept as keyof typeof departmentEmails]?.length || 0), 0
+                        )
+                      } email addresses
+                    </span>
+                  )}
+                  {selectedDepartments.length > 0 && campaignEmails.trim() && <span> + </span>}
+                  {campaignEmails.trim() && (
+                    <span>
+                      {campaignEmails.split("\n").filter(email => email.trim()).length} additional emails
+                    </span>
+                  )}
                 </div>
-                
-                <div>
-                  <Label htmlFor="additional-emails">Additional Email Addresses (optional)</Label>
-                  <Textarea
-                    id="additional-emails"
-                    value={campaignEmails}
-                    onChange={(e) => setCampaignEmails(e.target.value)}
-                    placeholder="Add extra email addresses (one per line)"
-                    rows={3}
-                  />
-                </div>
-
-                {selectedDepartments.length > 0 && (
-                  <div className="text-sm text-gray-600">
-                    Selected {selectedDepartments.length} department(s) with {
-                      selectedDepartments.reduce((total, dept) => 
-                        total + (departmentEmails[dept as keyof typeof departmentEmails]?.length || 0), 0
-                      )
-                    } email addresses
-                  </div>
-                )}
-              </div>
-            )}
+              )}
+            </div>
             
             <div className="flex space-x-3">
               <Button variant="outline" onClick={() => setShowLaunchDialog(false)}>

@@ -7,7 +7,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { GraduationCap, BookOpen, Target, CheckCircle, Clock, AlertTriangle, Play, FileText, Users, Shield, Mail, Key, Download, Award, Star, TrendingUp, ChevronRight, ChevronLeft, Brain, Trophy, Crown, Flame, Zap, Medal } from "lucide-react";
+import { GraduationCap, BookOpen, Target, CheckCircle, Clock, AlertTriangle, Play, FileText, Users, Shield, Mail, Key, Download, Award, Star, TrendingUp, ChevronRight, ChevronLeft, Brain, Trophy, Crown, Flame, Zap, Medal, Sparkles } from "lucide-react";
 
 export default function TrainingScenarios() {
   // Training scenarios with consistent "Start Training" buttons - force refresh
@@ -777,26 +777,115 @@ export default function TrainingScenarios() {
               </div>
             </div>
 
-            {/* Results */}
+            {/* Enhanced Gamified Results */}
             {showResults && (
-              <Card className="bg-green-50 border-green-200">
-                <CardContent className="p-6">
-                  <div className="text-center space-y-4">
-                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-                      <Trophy className="h-8 w-8 text-green-600" />
-                    </div>
-                    <h3 className="text-xl font-semibold text-green-900">Training Complete!</h3>
-                    <p className="text-green-700">You scored {exerciseScore}% on this training module</p>
-                    <div className="flex items-center justify-center space-x-4 text-sm">
-                      <div className="flex items-center space-x-1">
-                        <Star className="h-4 w-4 text-yellow-600" />
-                        <span>+125 XP</span>
+              <Card className="overflow-hidden">
+                <CardContent className="p-8 text-center relative">
+                  {/* Confetti Background Effect */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-50 via-pink-50 to-yellow-50 opacity-50"></div>
+                  
+                  <div className="relative z-10">
+                    <div className="mb-6">
+                      {/* Animated Trophy */}
+                      <div className="mx-auto w-20 h-20 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center mb-4 animate-bounce shadow-xl">
+                        <Crown className="h-10 w-10 text-white" />
                       </div>
-                      <div className="flex items-center space-x-1">
-                        <Medal className="h-4 w-4 text-purple-600" />
-                        <span>Achievement Unlocked</span>
+                      
+                      {/* Achievement Celebration */}
+                      <div className="flex justify-center items-center gap-2 mb-4">
+                        <Sparkles className="h-6 w-6 text-pink-500 animate-pulse" />
+                        <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                          MISSION ACCOMPLISHED!
+                        </h2>
+                        <Sparkles className="h-6 w-6 text-pink-500 animate-pulse" />
+                      </div>
+                      
+                      <p className="text-lg text-gray-700 mb-2">You've mastered this training module!</p>
+                      
+                      {/* Score-based message */}
+                      <div className="mb-4">
+                        {exerciseScore >= 90 && (
+                          <div className="bg-gradient-to-r from-green-100 to-emerald-100 border border-green-300 rounded-lg p-3">
+                            <div className="flex items-center justify-center gap-2 text-green-800">
+                              <Star className="h-5 w-5 text-yellow-500" />
+                              <span className="font-bold">EXCELLENT! You're a cybersecurity champion!</span>
+                              <Star className="h-5 w-5 text-yellow-500" />
+                            </div>
+                          </div>
+                        )}
+                        {exerciseScore >= 70 && exerciseScore < 90 && (
+                          <div className="bg-gradient-to-r from-blue-100 to-cyan-100 border border-blue-300 rounded-lg p-3">
+                            <div className="flex items-center justify-center gap-2 text-blue-800">
+                              <Target className="h-5 w-5 text-blue-600" />
+                              <span className="font-bold">GREAT JOB! You've got solid security skills!</span>
+                            </div>
+                          </div>
+                        )}
+                        {exerciseScore < 70 && (
+                          <div className="bg-gradient-to-r from-orange-100 to-yellow-100 border border-orange-300 rounded-lg p-3">
+                            <div className="flex items-center justify-center gap-2 text-orange-800">
+                              <Brain className="h-5 w-5 text-orange-600" />
+                              <span className="font-bold">GOOD START! Keep practicing to strengthen your skills!</span>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
+
+                    {/* Gamified Stats */}
+                    <div className="grid grid-cols-3 gap-6 mb-8">
+                      <div className="bg-gradient-to-br from-purple-100 to-purple-200 rounded-lg p-4 border-2 border-purple-300">
+                        <div className="text-4xl font-bold text-purple-700">{exerciseScore}%</div>
+                        <div className="text-sm text-purple-600 font-medium">Security Score</div>
+                        <div className="mt-1">
+                          {exerciseScore >= 90 && <Crown className="h-5 w-5 text-yellow-500 mx-auto" />}
+                          {exerciseScore >= 70 && exerciseScore < 90 && <Star className="h-5 w-5 text-blue-500 mx-auto" />}
+                          {exerciseScore < 70 && <Target className="h-5 w-5 text-orange-500 mx-auto" />}
+                        </div>
+                      </div>
+                      
+                      <div className="bg-gradient-to-br from-green-100 to-emerald-200 rounded-lg p-4 border-2 border-green-300">
+                        <div className="flex items-center justify-center gap-1 mb-1">
+                          <Zap className="h-6 w-6 text-yellow-500" />
+                          <div className="text-4xl font-bold text-green-700">125</div>
+                        </div>
+                        <div className="text-sm text-green-600 font-medium">XP Gained</div>
+                        <div className="text-xs text-green-600 mt-1">+{Math.round(125 * (exerciseScore/100))} bonus XP</div>
+                      </div>
+                      
+                      <div className="bg-gradient-to-br from-blue-100 to-cyan-200 rounded-lg p-4 border-2 border-blue-300">
+                        <div className="flex items-center justify-center gap-1 mb-1">
+                          <Award className="h-6 w-6 text-pink-500" />
+                          <div className="text-4xl font-bold text-blue-700">100</div>
+                        </div>
+                        <div className="text-sm text-blue-600 font-medium">Completion</div>
+                        <div className="text-xs text-blue-600 mt-1">All challenges!</div>
+                      </div>
+                    </div>
+
+                    {/* Achievement Badges */}
+                    <div className="mb-8">
+                      <h3 className="text-lg font-bold text-gray-800 mb-4">🏆 Achievements Unlocked</h3>
+                      <div className="flex justify-center gap-4 flex-wrap">
+                        <div className="bg-gradient-to-br from-yellow-200 to-yellow-300 rounded-lg p-3 border-2 border-yellow-400">
+                          <Medal className="h-6 w-6 text-yellow-700 mx-auto mb-1" />
+                          <div className="text-xs font-medium text-yellow-800">Training Master</div>
+                        </div>
+                        {exerciseScore >= 80 && (
+                          <div className="bg-gradient-to-br from-purple-200 to-purple-300 rounded-lg p-3 border-2 border-purple-400">
+                            <Star className="h-6 w-6 text-purple-700 mx-auto mb-1" />
+                            <div className="text-xs font-medium text-purple-800">High Achiever</div>
+                          </div>
+                        )}
+                        {exerciseScore === 100 && (
+                          <div className="bg-gradient-to-br from-pink-200 to-pink-300 rounded-lg p-3 border-2 border-pink-400">
+                            <Crown className="h-6 w-6 text-pink-700 mx-auto mb-1" />
+                            <div className="text-xs font-medium text-pink-800">Perfect Score</div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
                     <Button 
                       onClick={() => {
                         if (currentExercise) {
@@ -805,7 +894,7 @@ export default function TrainingScenarios() {
                         setShowExerciseModal(false);
                         setShowResults(false);
                       }}
-                      className="bg-cyber-primary hover:bg-blue-700"
+                      className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-3 text-lg font-medium"
                     >
                       Continue Learning
                     </Button>

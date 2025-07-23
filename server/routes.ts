@@ -269,7 +269,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           targetDepartments: ['custom']
         },
         targetAudience: ['custom'],
-        createdBy: 1 // Default user for now
+        createdBy: 4 // Use existing admin user
       });
 
       // Send phishing emails to all targets

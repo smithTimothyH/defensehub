@@ -248,8 +248,8 @@ export default function AIEducationHub() {
   };
 
   const startModule = (module: LearningModule) => {
-    // Navigate to the learning module page with the module ID
-    setLocation(`/learning-module?id=${module.id}&title=${encodeURIComponent(module.title)}`);
+    // Navigate to training scenarios page for interactive training
+    setLocation('/training-scenarios');
   };
 
   const completeModule = (module: LearningModule) => {

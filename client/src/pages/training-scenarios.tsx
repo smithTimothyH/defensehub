@@ -26,46 +26,68 @@ export default function TrainingScenarios() {
     {
       id: 1,
       title: "Email Security Fundamentals",
-      description: "Learn to identify and report suspicious emails",
+      description: "Master phishing detection and email security best practices",
       difficulty: "Beginner",
       duration: "15 min",
       completed: true,
       type: "interactive",
-      topics: ["Phishing", "Email Verification", "Safe Practices"],
+      topics: ["Phishing Detection", "Email Verification", "Suspicious Links"],
       steps: 6
     },
     {
       id: 2,
-      title: "Social Engineering Awareness",
-      description: "Recognize and defend against social engineering attacks",
+      title: "Social Engineering Defense",
+      description: "Learn to recognize and counter social manipulation attacks",
       difficulty: "Intermediate",
       duration: "25 min",
       completed: false,
-      type: "simulation",
-      topics: ["Social Engineering", "Psychology", "Defense"],
+      type: "scenario",
+      topics: ["Psychology", "Manipulation Tactics", "Human Firewall"],
       steps: 8
     },
     {
       id: 3,
-      title: "Incident Response Procedures", 
-      description: "Step-by-step guide to reporting security incidents",
+      title: "Incident Response Protocol",
+      description: "Essential steps for handling cybersecurity incidents effectively",
       difficulty: "Advanced",
-      duration: "30 min",
+      duration: "35 min",
       completed: false,
-      type: "simulation",
-      topics: ["Incident Response", "Communication", "Documentation"],
+      type: "scenario",
+      topics: ["Crisis Management", "Evidence Preservation", "Communication"],
       steps: 10
     },
     {
       id: 4,
-      title: "Password Security Best Practices",
-      description: "Create and manage strong, secure passwords",
+      title: "Password Security Mastery",
+      description: "Advanced password management and multi-factor authentication",
       difficulty: "Beginner",
       duration: "20 min",
-      completed: true,
-      type: "guide",
-      topics: ["Passwords", "Authentication", "Security"],
+      completed: false,
+      type: "interactive",
+      topics: ["Strong Passwords", "MFA", "Password Managers"],
       steps: 5
+    },
+    {
+      id: 5,
+      title: "Network Security Basics",
+      description: "Understanding network threats and safe browsing practices",
+      difficulty: "Intermediate",
+      duration: "30 min",
+      completed: false,
+      type: "game",
+      topics: ["WiFi Security", "VPN Usage", "Safe Browsing"],
+      steps: 8
+    },
+    {
+      id: 6,
+      title: "Data Protection & Privacy",
+      description: "GDPR compliance and personal data protection strategies",
+      difficulty: "Advanced",
+      duration: "40 min",
+      completed: false,
+      type: "challenge",
+      topics: ["GDPR", "Data Classification", "Privacy Rights"],
+      steps: 12
     }
   ]);
 
@@ -114,8 +136,9 @@ export default function TrainingScenarios() {
   const getTypeIcon = (type: string) => {
     switch (type) {
       case "interactive": return <Brain className="h-5 w-5 text-purple-600" />;
-      case "simulation": return <Target className="h-5 w-5 text-blue-600" />;
-      case "guide": return <BookOpen className="h-5 w-5 text-green-600" />;
+      case "scenario": return <Users className="h-5 w-5 text-blue-600" />;
+      case "game": return <Target className="h-5 w-5 text-green-600" />;
+      case "challenge": return <Trophy className="h-5 w-5 text-orange-600" />;
       default: return <FileText className="h-5 w-5 text-gray-600" />;
     }
   };

@@ -14,7 +14,7 @@ import {
   Brain, BookOpen, Play, Award, Star, Target, Zap, 
   Trophy, Medal, Crown, Flame, TrendingUp, Users, 
   Shield, Mail, Key, AlertTriangle, CheckCircle, Clock,
-  Gamepad2, Sparkles, ChevronRight, BarChart, PieChart, ChevronLeft
+  Gamepad2, Sparkles, ChevronRight, BarChart, PieChart, ChevronLeft, X
 } from "lucide-react";
 
 interface LearningModule {
@@ -67,6 +67,8 @@ export default function AIEducationHub() {
   const [score, setScore] = useState(0);
   const [showResults, setShowResults] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
+  const [showExplanation, setShowExplanation] = useState(false);
+  const [isCorrect, setIsCorrect] = useState(false);
   const { toast } = useToast();
 
   const [learningModules] = useState<LearningModule[]>([
@@ -261,6 +263,9 @@ export default function AIEducationHub() {
     setCurrentModule(module);
     setCurrentStep(0);
     setSelectedAnswer("");
+    setShowExplanation(false);
+    setShowResults(false);
+    setScore(0);
     setShowTrainingModal(true);
   };
 
@@ -376,6 +381,18 @@ export default function AIEducationHub() {
     return questions[moduleTitle]?.[step] || "What is the best security practice in this situation?";
   };
 
+  const getModuleQuestionCount = (moduleTitle: string) => {
+    const counts: Record<string, number> = {
+      "Email Security Fundamentals": 6,
+      "Social Engineering Defense": 7,
+      "Incident Response Protocol": 10,
+      "Password Security Mastery": 5,
+      "Network Security Basics": 8,
+      "Data Protection & Privacy": 12
+    };
+    return counts[moduleTitle] || 6;
+  };
+
   const getExerciseOptions = (moduleTitle: string, step: number) => {
     const options: Record<string, Array<Array<{value: string, label: string}>>> = {
       "Email Security Fundamentals": [
@@ -390,6 +407,30 @@ export default function AIEducationHub() {
           { value: "call", label: "Call the bank using the number on your official bank card" },
           { value: "search", label: "Search online for the bank's contact information" },
           { value: "wait", label: "Wait for another email to confirm it's real" }
+        ],
+        [
+          { value: "click", label: "Click the link immediately to update" },
+          { value: "expand", label: "Hover over or expand the URL to see the real destination" },
+          { value: "trust", label: "Trust it since it says it's a security update" },
+          { value: "copy", label: "Copy the link and paste it in a new browser" }
+        ],
+        [
+          { value: "open", label: "Open it since it looks like a PDF" },
+          { value: "scan", label: "Scan it with antivirus first" },
+          { value: "report", label: "Report it to IT security and do not open" },
+          { value: "save", label: "Save it to your desktop for later review" }
+        ],
+        [
+          { value: "ignore", label: "Ignore the headers and focus on the content" },
+          { value: "report", label: "Report the suspicious headers to IT security" },
+          { value: "reply", label: "Reply to ask about the domain mismatch" },
+          { value: "delete", label: "Delete the email immediately" }
+        ],
+        [
+          { value: "delete", label: "Delete it and don't report anything" },
+          { value: "forward", label: "Forward to IT security with full headers" },
+          { value: "warn", label: "Warning colleagues via company chat" },
+          { value: "screenshot", label: "Take a screenshot and email it to security" }
         ]
       ],
       "Social Engineering Defense": [
@@ -398,6 +439,42 @@ export default function AIEducationHub() {
           { value: "verify", label: "Ask for their employee ID and verify through proper channels" },
           { value: "refuse", label: "Refuse and hang up immediately" },
           { value: "supervisor", label: "Ask to speak with their supervisor first" }
+        ],
+        [
+          { value: "hold", label: "Hold the door open since they look professional" },
+          { value: "ask", label: "Ask to see their delivery receipt and contact the recipient" },
+          { value: "ignore", label: "Ignore them and let them figure it out" },
+          { value: "badge", label: "Let them in if they show any kind of badge" }
+        ],
+        [
+          { value: "share", label: "Share general information since it's just casual conversation" },
+          { value: "deflect", label: "Deflect with vague answers and change the subject" },
+          { value: "detail", label: "Give detailed explanations to be helpful" },
+          { value: "business", label: "Refer them to your business card for official inquiries" }
+        ],
+        [
+          { value: "comply", label: "Comply immediately since it's a security audit" },
+          { value: "verify", label: "Verify their identity and authority through official channels" },
+          { value: "refuse", label: "Refuse and hang up without verification" },
+          { value: "transfer", label: "Transfer them to HR without verification" }
+        ],
+        [
+          { value: "help", label: "Help them immediately since they have a badge" },
+          { value: "verify", label: "Verify their identity and authorization first" },
+          { value: "ignore", label: "Ignore their request completely" },
+          { value: "escort", label: "Escort them to security without questions" }
+        ],
+        [
+          { value: "act", label: "Act immediately to avoid losing access" },
+          { value: "verify", label: "Verify through official channels before taking action" },
+          { value: "wait", label: "Wait and do nothing" },
+          { value: "colleague", label: "Ask a colleague what to do" }
+        ],
+        [
+          { value: "plug", label: "Plug it in to see what executive bonuses are planned" },
+          { value: "turn", label: "Turn it in to security without connecting it" },
+          { value: "take", label: "Take it home to check it safely" },
+          { value: "ignore", label: "Ignore it and leave it there" }
         ]
       ]
     };
@@ -409,15 +486,68 @@ export default function AIEducationHub() {
     ];
   };
 
+  const isCorrectAnswer = (title: string, step: number, answer: string): boolean => {
+    if (title === "Email Security Fundamentals") {
+      const correctAnswers = ["verify", "call", "expand", "report", "report", "forward"];
+      return answer === correctAnswers[step];
+    }
+    if (title === "Social Engineering Defense") {
+      const correctAnswers = ["verify", "ask", "deflect", "verify", "verify", "verify", "turn"];
+      return answer === correctAnswers[step];
+    }
+    return answer === "verify" || answer === "report";
+  };
+
+  const getExplanation = (title: string, step: number, userAnswer: string): string => {
+    if (title === "Email Security Fundamentals") {
+      const explanations = [
+        "Always verify urgent requests through known channels. Attackers use urgency to bypass your judgment. Example: Call the CEO's assistant or use the company directory to verify unusual requests.",
+        "Never use links in suspicious emails. Contact your bank directly using official contact information. Example: Use the phone number on your debit card or bank statements, not the one in the email.",
+        "Check where links actually lead before clicking. URL expanders reveal the real destination safely. Example: Hover over the link to see 'malicious-site.com' instead of the claimed security update site.",
+        "Never open unexpected attachments. Report suspicious emails to IT security for proper analysis. Example: '.exe' files disguised as PDFs are common malware delivery methods.",
+        "Email headers can reveal spoofed addresses. Suspicious headers should be reported immediately. Example: The 'From' field shows your domain but the actual sending server is external.",
+        "Forward phishing emails with full headers to IT security so they can analyze threats and protect others. Example: Use 'Forward as Attachment' to preserve all technical details for investigation."
+      ];
+      return explanations[step] || "Always prioritize security verification over convenience.";
+    }
+    if (title === "Social Engineering Defense") {
+      const explanations = [
+        "IT will never ask for passwords over the phone. Always verify through official channels. Example: Hang up and call IT directly using the company directory number.",
+        "Verify delivery requests through proper channels. Example: Contact the intended recipient to confirm they're expecting a delivery before allowing access.",
+        "Deflect information gathering attempts politely but firmly. Example: 'I'm not the right person to ask about technical details. You should contact our public relations team.'",
+        "Security audits follow formal procedures with proper authorization. Example: Real auditors will have official documentation and can be verified through your compliance department.",
+        "Badges can be forged. Always verify identity and authorization. Example: Call the person they claim to be visiting or check with security before granting access.",
+        "Urgent security threats are verified through official channels, not random phone calls. Example: Your IT department will send official communications through established channels.",
+        "USB drives found in public areas are often baiting attacks. Example: Turn it in to security - these devices commonly contain malware designed to compromise your computer."
+      ];
+      return explanations[step] || "Always verify identity and authority before taking action.";
+    }
+    return "Security requires verification and following proper procedures.";
+  };
+
+  const handleAnswerSubmit = () => {
+    if (!currentModule || !selectedAnswer) return;
+    
+    const correct = isCorrectAnswer(currentModule.title, currentStep, selectedAnswer);
+    setIsCorrect(correct);
+    if (correct) {
+      setScore(prev => prev + 1);
+    }
+    setShowExplanation(true);
+  };
+
   const handleNextQuestion = () => {
     if (!currentModule) return;
     
+    const totalQuestions = getModuleQuestionCount(currentModule.title);
     const nextStep = currentStep + 1;
-    if (nextStep >= 6) { // Assuming 6 questions per module
+    
+    if (nextStep >= totalQuestions) {
       setShowResults(true);
     } else {
       setCurrentStep(nextStep);
       setSelectedAnswer("");
+      setShowExplanation(false);
     }
   };
 
@@ -780,48 +910,99 @@ export default function AIEducationHub() {
             {currentModule && !showResults ? (
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <Progress value={(currentStep / 6) * 100} className="flex-1 mr-4" />
-                  <span className="text-sm text-gray-500">{currentStep + 1} of 6</span>
+                  <Progress value={(currentStep / getModuleQuestionCount(currentModule.title)) * 100} className="flex-1 mr-4" />
+                  <span className="text-sm text-gray-500">{currentStep + 1} of {getModuleQuestionCount(currentModule.title)}</span>
                 </div>
                 
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">
-                    Step {currentStep + 1}: {getExerciseTitle(currentModule.title, currentStep)}
-                  </h3>
-                  
-                  <p className="text-gray-700 leading-relaxed">
-                    {getExerciseQuestion(currentModule.title, currentStep)}
-                  </p>
-                  
-                  <RadioGroup value={selectedAnswer} onValueChange={setSelectedAnswer}>
-                    {getExerciseOptions(currentModule.title, currentStep).map((option) => (
-                      <div key={option.value} className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50">
-                        <RadioGroupItem value={option.value} id={option.value} />
-                        <Label htmlFor={option.value} className="flex-1 cursor-pointer">
-                          {option.label}
-                        </Label>
+                {!showExplanation ? (
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold">
+                      Step {currentStep + 1}: {getExerciseTitle(currentModule.title, currentStep)}
+                    </h3>
+                    
+                    <p className="text-gray-700 leading-relaxed">
+                      {getExerciseQuestion(currentModule.title, currentStep)}
+                    </p>
+                    
+                    <RadioGroup value={selectedAnswer} onValueChange={setSelectedAnswer}>
+                      {getExerciseOptions(currentModule.title, currentStep).map((option) => (
+                        <div key={option.value} className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50">
+                          <RadioGroupItem value={option.value} id={option.value} />
+                          <Label htmlFor={option.value} className="flex-1 cursor-pointer">
+                            {option.label}
+                          </Label>
+                        </div>
+                      ))}
+                    </RadioGroup>
+                    
+                    <div className="flex justify-between">
+                      <Button 
+                        variant="outline" 
+                        onClick={() => {
+                          if (currentStep > 0) {
+                            setCurrentStep(currentStep - 1);
+                            setSelectedAnswer("");
+                            setShowExplanation(false);
+                          }
+                        }}
+                        disabled={currentStep === 0}
+                      >
+                        Previous
+                      </Button>
+                      
+                      <Button 
+                        onClick={handleAnswerSubmit}
+                        disabled={!selectedAnswer}
+                        className="bg-blue-600 hover:bg-blue-700"
+                      >
+                        Submit Answer
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className={`p-4 rounded-lg border-2 ${isCorrect ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+                      <div className="flex items-center gap-2 mb-3">
+                        {isCorrect ? (
+                          <CheckCircle className="h-5 w-5 text-green-600" />
+                        ) : (
+                          <X className="h-5 w-5 text-red-600" />
+                        )}
+                        <span className={`font-semibold ${isCorrect ? 'text-green-800' : 'text-red-800'}`}>
+                          {isCorrect ? 'Correct!' : 'Incorrect'}
+                        </span>
                       </div>
-                    ))}
-                  </RadioGroup>
-                </div>
-                
-                <div className="flex justify-between">
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
-                    disabled={currentStep === 0}
-                  >
-                    Previous
-                  </Button>
-                  
-                  <Button 
-                    onClick={handleNextQuestion}
-                    disabled={!selectedAnswer}
-                    className="bg-blue-600 hover:bg-blue-700"
-                  >
-                    Next
-                  </Button>
-                </div>
+                      
+                      <div className={`text-sm ${isCorrect ? 'text-green-700' : 'text-red-700'}`}>
+                        <strong>Your answer:</strong> {getExerciseOptions(currentModule.title, currentStep).find(opt => opt.value === selectedAnswer)?.label}
+                      </div>
+                      
+                      {!isCorrect && (
+                        <div className="text-sm text-green-700 mt-2">
+                          <strong>Correct answer:</strong> {getExerciseOptions(currentModule.title, currentStep).find(opt => 
+                            isCorrectAnswer(currentModule.title, currentStep, opt.value))?.label}
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                      <h4 className="font-semibold text-blue-800 mb-2">Explanation:</h4>
+                      <p className="text-blue-700 text-sm leading-relaxed">
+                        {getExplanation(currentModule.title, currentStep, selectedAnswer)}
+                      </p>
+                    </div>
+                    
+                    <div className="flex justify-center">
+                      <Button 
+                        onClick={handleNextQuestion}
+                        className="bg-blue-600 hover:bg-blue-700"
+                      >
+                        {currentStep + 1 >= getModuleQuestionCount(currentModule.title) ? 'Finish Module' : 'Next Question'}
+                        <ChevronRight className="h-4 w-4 ml-2" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : showResults && currentModule ? (
               <div className="text-center space-y-6">
@@ -838,17 +1019,23 @@ export default function AIEducationHub() {
                   </p>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-4 max-w-sm mx-auto">
+                <div className="grid grid-cols-3 gap-4 max-w-lg mx-auto">
                   <div className="text-center p-4 bg-purple-50 rounded-lg">
                     <Star className="h-8 w-8 text-purple-600 mx-auto mb-2" />
                     <div className="text-2xl font-bold text-purple-600">+{currentModule.xpReward}</div>
                     <div className="text-sm text-purple-600">XP Earned</div>
                   </div>
                   
+                  <div className="text-center p-4 bg-green-50 rounded-lg">
+                    <CheckCircle className="h-8 w-8 text-green-600 mx-auto mb-2" />
+                    <div className="text-2xl font-bold text-green-600">{score}/{getModuleQuestionCount(currentModule.title)}</div>
+                    <div className="text-sm text-green-600">Correct</div>
+                  </div>
+                  
                   <div className="text-center p-4 bg-blue-50 rounded-lg">
                     <Trophy className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-                    <div className="text-2xl font-bold text-blue-600">100%</div>
-                    <div className="text-sm text-blue-600">Complete</div>
+                    <div className="text-2xl font-bold text-blue-600">{Math.round((score / getModuleQuestionCount(currentModule.title)) * 100)}%</div>
+                    <div className="text-sm text-blue-600">Score</div>
                   </div>
                 </div>
                 

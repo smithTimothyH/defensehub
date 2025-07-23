@@ -63,82 +63,79 @@ export default function AIEducationHub() {
   const [learningModules] = useState<LearningModule[]>([
     {
       id: 1,
-      title: "Email Security Masters",
-      description: "Interactive email security training with real-world scenarios",
+      title: "Email Security Fundamentals",
+      description: "Master phishing detection and email security best practices",
       difficulty: "Beginner",
       duration: "15 min",
       completed: true,
       xpReward: 125,
       type: "interactive",
-      topics: ["Phishing", "Email Verification", "Safe Practices"],
+      topics: ["Phishing Detection", "Email Verification", "Suspicious Links"],
       engagementLevel: "High",
       adaptiveContent: true
     },
     {
       id: 2,
-      title: "Social Engineering Detective",
-      description: "Become a detective and solve social engineering mysteries",
+      title: "Social Engineering Defense",
+      description: "Learn to recognize and counter social manipulation attacks",
       difficulty: "Intermediate",
       duration: "25 min",
       completed: false,
-      xpReward: 175,
-      type: "game",
-      topics: ["Social Engineering", "Psychology", "Detection"],
+      xpReward: 200,
+      type: "scenario",
+      topics: ["Psychology", "Manipulation Tactics", "Human Firewall"],
       engagementLevel: "High",
-      adaptiveContent: true,
-      prerequisite: 1
+      adaptiveContent: true
     },
     {
       id: 3,
-      title: "Incident Response Hero",
-      description: "Lead your team through cybersecurity incident scenarios",
+      title: "Incident Response Protocol",
+      description: "Essential steps for handling cybersecurity incidents effectively",
       difficulty: "Advanced",
-      duration: "30 min",
+      duration: "35 min",
       completed: false,
-      xpReward: 225,
+      xpReward: 300,
       type: "scenario",
-      topics: ["Incident Response", "Leadership", "Communication"],
-      engagementLevel: "High",
-      adaptiveContent: true,
-      prerequisite: 2
+      topics: ["Crisis Management", "Evidence Preservation", "Communication"],
+      engagementLevel: "Medium",
+      adaptiveContent: true
     },
     {
       id: 4,
-      title: "Password Fortress Builder",
-      description: "Build the ultimate password security fortress",
+      title: "Password Security Mastery",
+      description: "Advanced password management and multi-factor authentication",
       difficulty: "Beginner",
       duration: "20 min",
-      completed: true,
-      xpReward: 125,
+      completed: false,
+      xpReward: 150,
       type: "interactive",
-      topics: ["Passwords", "Authentication", "Security"],
-      engagementLevel: "Medium",
-      adaptiveContent: false
+      topics: ["Strong Passwords", "MFA", "Password Managers"],
+      engagementLevel: "High",
+      adaptiveContent: true
     },
     {
       id: 5,
-      title: "Malware Hunter Challenge",
-      description: "Hunt down malware threats in this exciting challenge",
+      title: "Network Security Basics",
+      description: "Understanding network threats and safe browsing practices",
       difficulty: "Intermediate",
-      duration: "35 min",
+      duration: "30 min",
       completed: false,
-      xpReward: 200,
-      type: "challenge",
-      topics: ["Malware", "Detection", "Analysis"],
+      xpReward: 250,
+      type: "game",
+      topics: ["WiFi Security", "VPN Usage", "Safe Browsing"],
       engagementLevel: "High",
-      adaptiveContent: true,
-      prerequisite: 1
+      adaptiveContent: true
     },
     {
       id: 6,
-      title: "Privacy Guardian",
-      description: "Master data privacy and protection techniques",
-      difficulty: "Intermediate",
-      duration: "28 min",
+      title: "Data Protection & Privacy",
+      description: "GDPR compliance and personal data protection strategies",
+      difficulty: "Advanced",
+      duration: "40 min",
       completed: false,
-      xpReward: 175,
-      type: "interactive",
-      topics: ["Privacy", "Data Protection", "GDPR"],
+      xpReward: 350,
+      type: "challenge",
+      topics: ["GDPR", "Data Classification", "Privacy Rights"],
       engagementLevel: "Medium",
       adaptiveContent: true
     }
@@ -187,29 +184,38 @@ export default function AIEducationHub() {
     {
       id: 1,
       name: "Essential Security Foundations",
-      description: "Start your cybersecurity journey with fundamental concepts",
+      description: "Perfect starting point for cybersecurity beginners",
       modules: [1, 4],
       difficulty: "Beginner",
       estimatedTime: "35 min",
-      completion: 100
+      completion: 50
     },
     {
       id: 2,
-      name: "Advanced Threat Detection",
-      description: "Master advanced threat detection and response techniques",
-      modules: [2, 3, 5],
-      difficulty: "Advanced",
-      estimatedTime: "90 min",
+      name: "Human Security Specialist",
+      description: "Master social engineering defense and incident response",
+      modules: [2, 3],
+      difficulty: "Intermediate to Advanced",
+      estimatedTime: "60 min",
       completion: 0
     },
     {
       id: 3,
-      name: "Complete Security Professional",
-      description: "Comprehensive training for security professionals",
+      name: "Technical Security Expert",
+      description: "Advanced network security and data protection",
+      modules: [5, 6],
+      difficulty: "Intermediate to Advanced",
+      estimatedTime: "70 min",
+      completion: 0
+    },
+    {
+      id: 4,
+      name: "Complete Cybersecurity Professional",
+      description: "Full comprehensive training covering all security domains",
       modules: [1, 2, 3, 4, 5, 6],
       difficulty: "All Levels",
       estimatedTime: "2.5 hours",
-      completion: 33
+      completion: 17
     }
   ]);
 
@@ -464,7 +470,7 @@ export default function AIEducationHub() {
                       <Button 
                         onClick={() => {
                           const nextModule = learningModules.find(m => 
-                            path.modules.includes(m.id) && !m.completed
+                            path.modules.includes(m.id) && m.completed === false
                           );
                           if (nextModule) {
                             startModule(nextModule);

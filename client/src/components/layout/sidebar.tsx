@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Shield, BarChart3, Fish, GraduationCap, Brain, FileText, Users, Settings, Mail } from "lucide-react";
+import { Shield, BarChart3, Fish, GraduationCap, Brain, FileText, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navigation = [
@@ -9,11 +9,10 @@ const navigation = [
   { name: "Phishing Simulator", href: "/phishing-simulator", icon: Fish, category: "Main" },
   { name: "Reports", href: "/reports", icon: FileText, category: "Analytics" },
   { name: "Email Center", href: "/email-center", icon: Mail, category: "Analytics" },
-  { name: "User Management", href: "/users", icon: Users, category: "System" },
-  { name: "Settings", href: "/settings", icon: Settings, category: "System" },
+
 ];
 
-const categories = ["Main", "Analytics", "System"];
+const categories = ["Main", "Analytics"];
 
 export default function Sidebar() {
   const [location] = useLocation();

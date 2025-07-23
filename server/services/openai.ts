@@ -7,7 +7,7 @@ const openai = new OpenAI({
 
 export interface PhishingScenarioConfig {
   difficulty: "basic" | "intermediate" | "advanced";
-  targetAudience: string[];
+  targetAudience: string | string[];
   companyName?: string;
   industry?: string;
 }
@@ -36,9 +36,13 @@ export interface CrisisScenario {
 }
 
 export async function generatePhishingScenario(config: PhishingScenarioConfig): Promise<PhishingScenarioResult> {
+  const targetAudienceStr = Array.isArray(config.targetAudience) 
+    ? config.targetAudience.join(", ") 
+    : config.targetAudience;
+    
   const prompt = `Generate a realistic phishing email scenario with the following requirements:
 - Difficulty level: ${config.difficulty}
-- Target audience: ${config.targetAudience.join(", ")}
+- Target audience: ${targetAudienceStr}
 - Company: ${config.companyName || "Generic Corporation"}
 - Industry: ${config.industry || "Technology"}
 

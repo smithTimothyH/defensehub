@@ -259,11 +259,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create a new simulation entry for this campaign
       const campaign = await storage.createSimulation({
         name: campaignName,
-        description: `Phishing campaign targeting ${emailList.length} users`,
         type: 'phishing',
         status: 'active',
+        configuration: {
+          description: `Phishing campaign targeting ${emailList.length} users`,
+          difficulty: 'intermediate',
+          emailCount: emailList.length,
+          scenario: 'account_verification',
+          targetDepartments: ['custom']
+        },
         targetAudience: ['custom'],
-        userId: 1 // Default user for now
+        createdBy: 1 // Default user for now
       });
 
       // Send phishing emails to all targets

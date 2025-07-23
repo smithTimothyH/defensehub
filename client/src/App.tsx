@@ -9,6 +9,7 @@ import Dashboard from "@/pages/dashboard";
 import PhishingSimulator from "@/pages/phishing-simulator";
 import TrainingScenarios from "@/pages/training-scenarios";
 import AIEducationHub from "@/pages/ai-education-hub";
+import LearningModule from "@/pages/learning-module";
 import Reports from "@/pages/reports";
 
 
@@ -23,6 +24,7 @@ function Router() {
       <Route path="/phishing-simulator" component={PhishingSimulator} />
       <Route path="/training-scenarios" component={TrainingScenarios} />
       <Route path="/ai-education-hub" component={AIEducationHub} />
+      <Route path="/learning-module" component={LearningModule} />
       <Route path="/reports" component={Reports} />
       <Route path="/email-center" component={EmailCenter} />
       <Route path="/phishing-caught" component={PhishingCaught} />

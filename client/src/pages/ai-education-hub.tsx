@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -50,6 +51,7 @@ interface LearningPath {
 }
 
 export default function AIEducationHub() {
+  const [, setLocation] = useLocation();
   const [selectedModule, setSelectedModule] = useState<LearningModule | null>(null);
   const [showModuleDialog, setShowModuleDialog] = useState(false);
   const [activeTab, setActiveTab] = useState("modules");
@@ -240,8 +242,8 @@ export default function AIEducationHub() {
   };
 
   const startModule = (module: LearningModule) => {
-    setSelectedModule(module);
-    setShowModuleDialog(true);
+    // Navigate to the learning module page with the module ID
+    setLocation(`/learning-module?id=${module.id}&title=${encodeURIComponent(module.title)}`);
   };
 
   const completeModule = (module: LearningModule) => {
@@ -394,22 +396,10 @@ export default function AIEducationHub() {
                     <Button 
                       onClick={() => startModule(module)}
                       disabled={module.prerequisite && !learningModules.find(m => m.id === module.prerequisite)?.completed}
-                      className={`w-full ${module.completed 
-                        ? 'bg-green-600 hover:bg-green-700' 
-                        : 'bg-purple-600 hover:bg-purple-700'
-                      }`}
+                      className="w-full bg-purple-600 hover:bg-purple-700"
                     >
-                      {module.completed ? (
-                        <>
-                          <CheckCircle className="mr-2 h-4 w-4" />
-                          Review Module
-                        </>
-                      ) : (
-                        <>
-                          <Play className="mr-2 h-4 w-4" />
-                          Start Learning
-                        </>
-                      )}
+                      <Play className="mr-2 h-4 w-4" />
+                      Start Learning
                     </Button>
                   </CardContent>
                 </Card>
@@ -471,8 +461,18 @@ export default function AIEducationHub() {
                         )}
                       </div>
                       
-                      <Button variant="outline" className="border-purple-200 text-purple-600 hover:bg-purple-50">
-                        Continue Path
+                      <Button 
+                        onClick={() => {
+                          const nextModule = learningModules.find(m => 
+                            path.modules.includes(m.id) && !m.completed
+                          );
+                          if (nextModule) {
+                            startModule(nextModule);
+                          }
+                        }}
+                        className="bg-purple-600 hover:bg-purple-700 text-white"
+                      >
+                        Start Learning
                         <ChevronRight className="ml-2 h-4 w-4" />
                       </Button>
                     </div>

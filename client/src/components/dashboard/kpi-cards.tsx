@@ -1,33 +1,33 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, TrendingUp, Target, Award, Shield, AlertTriangle, Users, Activity } from "lucide-react";
+import { BookOpen, TrendingUp, Target, Award, Users, Activity } from "lucide-react";
 import { useState, useEffect } from "react";
 
 export default function KPICards() {
   const [realTimeMetrics, setRealTimeMetrics] = useState({
-    activeThreats: 0,
-    securityScore: 92,
-    usersOnline: 247,
-    incidentsToday: 3
+    activeLearners: 247,
+    completedToday: 18,
+    trainingHours: 156,
+    averageScore: 87
   });
 
   const { data: stats, isLoading } = useQuery({
     queryKey: ["/api/dashboard/stats"],
   });
 
-  // Simulate real-time updates for security metrics
+  // Simulate real-time updates for learning metrics
   useEffect(() => {
     const updateMetrics = () => {
       setRealTimeMetrics(prev => ({
-        activeThreats: Math.max(0, prev.activeThreats + (Math.random() > 0.7 ? 1 : -1)),
-        securityScore: Math.min(100, Math.max(85, prev.securityScore + (Math.random() - 0.5) * 2)),
-        usersOnline: Math.max(200, prev.usersOnline + Math.floor((Math.random() - 0.5) * 10)),
-        incidentsToday: Math.max(0, prev.incidentsToday + (Math.random() > 0.9 ? 1 : 0))
+        activeLearners: Math.max(180, prev.activeLearners + Math.floor((Math.random() - 0.5) * 8)),
+        completedToday: Math.max(0, prev.completedToday + (Math.random() > 0.8 ? 1 : 0)),
+        trainingHours: Math.max(120, prev.trainingHours + Math.floor((Math.random() - 0.4) * 3)),
+        averageScore: Math.min(95, Math.max(80, prev.averageScore + (Math.random() - 0.5) * 1))
       }));
     };
 
-    const interval = setInterval(updateMetrics, 15000); // Update every 15 seconds
+    const interval = setInterval(updateMetrics, 20000); // Update every 20 seconds
     return () => clearInterval(interval);
   }, []);
 
@@ -47,44 +47,53 @@ export default function KPICards() {
 
   const kpis = [
     {
-      title: "Security Score",
-      value: `${Math.round(realTimeMetrics.securityScore)}%`,
-      icon: Shield,
-      change: realTimeMetrics.securityScore >= 90 ? "Excellent" : "Good",
-      changeType: realTimeMetrics.securityScore >= 90 ? "positive" : "neutral",
-      bgColor: "bg-green-100",
-      iconColor: "text-cyber-success",
-      description: "Overall security posture",
-      realTime: true,
-      pulse: realTimeMetrics.securityScore < 85
-    },
-    {
-      title: "Active Threats",
-      value: realTimeMetrics.activeThreats,
-      icon: AlertTriangle,
-      change: realTimeMetrics.activeThreats === 0 ? "All Clear" : `${realTimeMetrics.activeThreats} detected`,
-      changeType: realTimeMetrics.activeThreats === 0 ? "positive" : "negative",
-      bgColor: realTimeMetrics.activeThreats === 0 ? "bg-green-100" : "bg-red-100",
-      iconColor: realTimeMetrics.activeThreats === 0 ? "text-cyber-success" : "text-red-600",
-      description: "Live threat monitoring",
-      realTime: true,
-      pulse: realTimeMetrics.activeThreats > 0
-    },
-    {
-      title: "Users Online",
-      value: realTimeMetrics.usersOnline,
+      title: "Active Learners",
+      value: realTimeMetrics.activeLearners,
       icon: Users,
       change: "Training active",
       changeType: "positive",
       bgColor: "bg-blue-100",
       iconColor: "text-cyber-primary",
-      description: "Active learning sessions",
+      description: "Currently learning",
       realTime: true
     },
     {
-      title: "Learning Progress",
-      value: `${(stats as any)?.knowledgeScore || 78}%`,
+      title: "Completed Today",
+      value: realTimeMetrics.completedToday,
+      icon: Award,
+      change: "Modules finished",
+      changeType: "positive",
+      bgColor: "bg-green-100",
+      iconColor: "text-cyber-success",
+      description: "Daily completions",
+      realTime: true
+    },
+    {
+      title: "Training Hours",
+      value: `${realTimeMetrics.trainingHours}h`,
+      icon: BookOpen,
+      change: "This week",
+      changeType: "positive",
+      bgColor: "bg-purple-100",
+      iconColor: "text-purple-600",
+      description: "Total learning time",
+      realTime: true
+    },
+    {
+      title: "Average Score",
+      value: `${Math.round(realTimeMetrics.averageScore)}%`,
       icon: TrendingUp,
+      change: realTimeMetrics.averageScore >= 85 ? "Excellent" : "Good",
+      changeType: realTimeMetrics.averageScore >= 85 ? "positive" : "neutral",
+      bgColor: "bg-emerald-100",
+      iconColor: "text-emerald-600",
+      description: "Learning performance",
+      realTime: true
+    },
+    {
+      title: "Overall Progress",
+      value: `${(stats as any)?.knowledgeScore || 78}%`,
+      icon: Target,
       change: "+12% this week",
       changeType: "positive",
       bgColor: "bg-purple-100",
@@ -100,9 +109,7 @@ export default function KPICards() {
         return (
           <Card 
             key={kpi.title} 
-            className={`transition-all duration-200 ${
-              kpi.pulse ? 'animate-pulse border-orange-300' : ''
-            }`}
+            className="transition-all duration-200"
           >
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -122,9 +129,7 @@ export default function KPICards() {
                   <p className="text-3xl font-bold text-gray-900 mt-1">{kpi.value}</p>
                   <p className="text-xs text-gray-500 mt-1">{kpi.description}</p>
                 </div>
-                <div className={`w-12 h-12 ${kpi.bgColor} rounded-lg flex items-center justify-center ml-4 ${
-                  kpi.pulse ? 'animate-pulse' : ''
-                }`}>
+                <div className={`w-12 h-12 ${kpi.bgColor} rounded-lg flex items-center justify-center ml-4`}>
                   <Icon className={`${kpi.iconColor} w-6 h-6`} />
                 </div>
               </div>

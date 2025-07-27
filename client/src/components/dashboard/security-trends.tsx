@@ -7,7 +7,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { useState, useEffect } from "react";
 
 export default function LearningProgress() {
-  const [viewMode, setViewMode] = useState<'learning' | 'threats' | 'analytics'>('learning');
+  const [viewMode, setViewMode] = useState<'learning' | 'progress' | 'analytics'>('learning');
   const [threatData, setThreatData] = useState<any[]>([]);
   const [securityTrends, setSecurityTrends] = useState<any[]>([]);
 
@@ -258,10 +258,10 @@ export default function LearningProgress() {
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-gray-900 flex items-center">
             {viewMode === 'learning' && <BookOpen className="h-5 w-5 mr-2 text-cyber-primary" />}
-            {viewMode === 'threats' && <TrendingUp className="h-5 w-5 mr-2 text-cyber-primary" />}
+            {viewMode === 'progress' && <TrendingUp className="h-5 w-5 mr-2 text-cyber-primary" />}
             {viewMode === 'analytics' && <Activity className="h-5 w-5 mr-2 text-cyber-primary" />}
             {viewMode === 'learning' ? 'Learning Progress' : 
-             viewMode === 'threats' ? 'Threat Landscape' : 'Security Analytics'}
+             viewMode === 'progress' ? 'Module Progress' : 'Learning Analytics'}
           </h3>
           <div className="flex space-x-2">
             <Button
@@ -275,12 +275,12 @@ export default function LearningProgress() {
             </Button>
             <Button
               size="sm"
-              variant={viewMode === 'threats' ? 'default' : 'outline'}
-              onClick={() => setViewMode('threats')}
-              className={viewMode === 'threats' ? 'bg-cyber-primary hover:bg-blue-700' : ''}
+              variant={viewMode === 'progress' ? 'default' : 'outline'}
+              onClick={() => setViewMode('progress')}
+              className={viewMode === 'progress' ? 'bg-cyber-primary hover:bg-blue-700' : ''}
             >
               <Eye className="h-4 w-4 mr-1" />
-              Threats
+              Progress
             </Button>
             <Button
               size="sm"
@@ -340,7 +340,7 @@ export default function LearningProgress() {
           </div>
         )}
         
-        {viewMode === 'threats' && renderThreatLandscape()}
+        {viewMode === 'progress' && renderThreatLandscape()}
         {viewMode === 'analytics' && renderAnalytics()}
       </CardContent>
     </Card>

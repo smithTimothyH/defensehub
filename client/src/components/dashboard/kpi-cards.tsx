@@ -90,16 +90,6 @@ export default function KPICards() {
       description: "Learning performance",
       realTime: true
     },
-    {
-      title: "Overall Progress",
-      value: `${(stats as any)?.knowledgeScore || 78}%`,
-      icon: Target,
-      change: "+12% this week",
-      changeType: "positive",
-      bgColor: "bg-purple-100",
-      iconColor: "text-purple-600",
-      description: "Knowledge advancement"
-    },
   ];
 
   return (

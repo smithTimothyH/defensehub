@@ -13,7 +13,8 @@ Preferred communication style: Simple, everyday language.
 ## Recent Changes (January 2025)
 
 ✓ **Platform Transformation** - Shifted from GRC compliance testing to dedicated cybersecurity education hub
-✓ **Educational Focus** - Redesigned platform to prioritize employee learning and skill development over compliance testing
+✓ **Pure Educational Focus** - Complete removal of all threat/security operations elements to maintain exclusive focus on learning
+✓ **Educational Dashboard** - Replaced security operations metrics with learning-focused analytics (Active Learners, Completed Today, Training Hours, Average Score)
 
 ✓ **Interactive Training System** - Complete training modules with realistic cybersecurity scenarios
 ✓ **XP Gamification** - Real experience point system that tracks actual learning progress (125 XP per completed module)

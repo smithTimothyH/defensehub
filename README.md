@@ -9,6 +9,8 @@
 
 DefenseHub is an innovative AI-powered cybersecurity education platform designed exclusively for employee learning and training. The platform focuses purely on educational experiences through interactive training modules, realistic phishing simulations, and gamified learning - with no security operations or threat monitoring components.
 
+Live Demo: https://sentinel-security-zerocalm.replit.app/reports
+
 ### 🎯 Key Features
 
 - **Pure Educational Focus** - 100% dedicated to learning with no security operations

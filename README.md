@@ -1,6 +1,6 @@
 # DefenseHub: AI-Powered Cybersecurity Education Platform
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-🚀%20View%20App-blue)](DEPLOYMENT_URL_HERE)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-🚀%20View%20App-blue)](https://sentinel-security-zerocalm.replit.app/reports)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green)](https://nodejs.org/)
 [![React](https://img.shields.io/badge/React-18+-blue)](https://reactjs.org/)
